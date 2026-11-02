@@ -1,34 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Courier_Prime, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const serif = Source_Serif_4({
   subsets: ["latin"],
+  axes: ["opsz"],
+  variable: "--font-source-serif",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const mono = Courier_Prime({
   subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-courier-prime",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "IssueSolved inc",
-  description: "Cloud and AI Consulting",
+  title: "IssueSolved",
+  description:
+    "IssueSolved builds and runs the AI workflows, automations, and cloud backends that fit how your business already works.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f5f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#141414" },
+  ],
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en-CA" className={`${serif.variable} ${mono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

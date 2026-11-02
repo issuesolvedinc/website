@@ -1,0 +1,91 @@
+/*
+  IssueSolved design tokens.
+  Ink, paper, three grays. One muted red, used only for error states.
+  Components use the semantic tokens (--bg, --fg, ...), never the palette directly.
+  A theme can be forced on any element with data-theme="light" or data-theme="dark".
+*/
+
+:root {
+  /* Palette, light */
+  --ink: #141414;
+  --paper: #f7f5f0;
+  --gray-700: #5c5852; /* secondary text, 6.48:1 on paper */
+  --gray-300: #b3ada2; /* rules and quiet borders, never text */
+  --gray-100: #ece8e0; /* fills */
+  --red-on-paper: #8c2f1f; /* errors only, 7.58:1 on paper */
+
+  /* Palette, dark */
+  --night: #141414;
+  --chalk: #f2efe8;
+  --gray-700-night: #a8a39a; /* secondary text, 7.34:1 on night */
+  --gray-300-night: #4a4843;
+  --gray-100-night: #242422;
+  --red-on-night: #e08a78; /* errors only, 7.08:1 on night */
+
+  /* Spacing, a 4px base. Matches Tailwind's spacing scale (p-4 = --space-4). */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --page-max: 68rem; /* outer width of the page */
+  --measure: 38rem; /* longest line of reading text */
+  --label-col: 11rem; /* left column for section numbers on wide screens */
+  --gutter: 1rem; /* page side margin */
+  --rule-width: 1px;
+  --rule-width-strong: 2px;
+
+  /* Motion: color and underline changes only, never decoration */
+  --duration: 150ms;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 3rem;
+  }
+}
+
+:root,
+[data-theme="light"] {
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --fg-muted: var(--gray-700);
+  --rule: var(--gray-300);
+  --fill: var(--gray-100);
+  --error: var(--red-on-paper);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--night);
+    --fg: var(--chalk);
+    --fg-muted: var(--gray-700-night);
+    --rule: var(--gray-300-night);
+    --fill: var(--gray-100-night);
+    --error: var(--red-on-night);
+    color-scheme: dark;
+  }
+}
+
+[data-theme="dark"] {
+  --bg: var(--night);
+  --fg: var(--chalk);
+  --fg-muted: var(--gray-700-night);
+  --rule: var(--gray-300-night);
+  --fill: var(--gray-100-night);
+  --error: var(--red-on-night);
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration: 0ms;
+  }
+}

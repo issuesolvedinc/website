@@ -1,27 +1,14 @@
-# Cool Landing Pages
+# IssueSolved website
 
-Headless landing pages for your launching domains and services
-
-## Examples
-
-Simple -> /demo/simple
-
-![image](assets/demo/simple.gif)
-
-Coming Soon (with registration email) -> /demo/comingsoon
-
-![image](assets/demo/comingsoon.gif)
-
-Lines Demo: /demo/lines
-
-![image](assets/demo/lines.gif)
-
-## Quick Start
+The site at issuesolved.ca. Next.js static export, Tailwind 4.
 
 ```bash
-npm run dev
+npm install
+npm run dev          # local preview at http://localhost:3000
+npm run build        # static site in build/
+npm run check:voice  # em dashes and banned words in src/ and DESIGN.md
 ```
 
-## Quick deployment
-
-Deploy to Github pages, Netlify or Vercel - You also can enable netifly forms to handle coming soon email.
+- `/` is the one page site. `/design-system` is the specimen, not linked and not indexed.
+- Rules, tokens and components: `DESIGN.md`. Logo work in progress: `docs/design/`.
+- Netlify builds from `netlify.toml` and deploys the `main` branch.

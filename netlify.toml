@@ -1,0 +1,7 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  # The version the static export was last built and checked with.
+  NODE_VERSION = "24.16.0"
