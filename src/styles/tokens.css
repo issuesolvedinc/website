@@ -13,6 +13,8 @@
   --gray-300: #b3ada2; /* rules and quiet borders, never text */
   --gray-100: #ece8e0; /* fills */
   --red-on-paper: #8c2f1f; /* errors only, 7.58:1 on paper */
+  --orange: #ff9a00; /* the accent: shapes, beams, the moving dot on a flow. 2.13:1 on white, never text on light */
+  --orange-text: #9a5300; /* the accent as text on paper, 5.34:1 */
 
   /* Palette, dark */
   --night: #141414;
@@ -41,7 +43,7 @@
   --rule-width: 1px;
   --rule-width-strong: 2px;
 
-  /* Motion: color and underline changes only, never decoration */
+  /* Motion. --duration is for color and underline changes. Effects check reduced motion themselves. */
   --duration: 150ms;
 }
 
@@ -59,6 +61,10 @@
   --rule: var(--gray-300);
   --fill: var(--gray-100);
   --error: var(--red-on-paper);
+  --accent: var(--orange);
+  --accent-fg: var(--orange-text);
+  --glass: color-mix(in srgb, var(--paper) 72%, transparent);
+  --glass-edge: color-mix(in srgb, var(--ink) 14%, transparent);
   color-scheme: light;
 }
 
@@ -70,6 +76,10 @@
     --rule: var(--gray-300-night);
     --fill: var(--gray-100-night);
     --error: var(--red-on-night);
+    --accent: var(--orange);
+    --accent-fg: var(--orange);
+    --glass: color-mix(in srgb, var(--night) 68%, transparent);
+    --glass-edge: color-mix(in srgb, var(--chalk) 16%, transparent);
     color-scheme: dark;
   }
 }
@@ -81,6 +91,10 @@
   --rule: var(--gray-300-night);
   --fill: var(--gray-100-night);
   --error: var(--red-on-night);
+  --accent: var(--orange);
+  --accent-fg: var(--orange);
+  --glass: color-mix(in srgb, var(--night) 68%, transparent);
+  --glass-edge: color-mix(in srgb, var(--chalk) 16%, transparent);
   color-scheme: dark;
 }
 

@@ -10,6 +10,10 @@
   --color-rule: var(--rule);
   --color-fill: var(--fill);
   --color-error: var(--error);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-glass: var(--glass);
+  --color-glass-edge: var(--glass-edge);
 
   --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
   --font-mono: var(--font-courier-prime), "Courier New", Courier, monospace;

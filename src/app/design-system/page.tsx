@@ -14,6 +14,11 @@ import {
   TextLink,
   Wordmark,
 } from "@/components";
+import { AgentFlow } from "@/components/agent-flow/agent-flow";
+import { BackgroundBeams } from "@/components/effects/background-beams";
+import { BackgroundBeamsWithCollision } from "@/components/effects/background-beams-with-collision";
+import { BackgroundLines } from "@/components/effects/background-lines";
+import { drawingReviewFlow, rfiFlow } from "@/content/example-flows";
 
 export const metadata: Metadata = {
   title: "Design system | IssueSolved",
@@ -35,6 +40,10 @@ const colors = [
   { token: "--rule", use: "Thin rules and quiet borders, never text", light: "#b3ada2", dark: "#4a4843" },
   { token: "--fill", use: "Note boxes and hover fills", light: "#ece8e0", dark: "#242422" },
   { token: "--error", use: "Error states only", light: "#8c2f1f", dark: "#e08a78" },
+  { token: "--accent", use: "Shapes and moving lights. Never text on a light ground", light: "#ff9a00", dark: "#ff9a00" },
+  { token: "--accent-fg", use: "The accent when it is text", light: "#9a5300", dark: "#ff9a00" },
+  { token: "--glass", use: "Frosted surfaces over an effect, with a 10px blur", light: "paper at 72%", dark: "night at 68%" },
+  { token: "--glass-edge", use: "The edge of a frosted surface", light: "ink at 14%", dark: "chalk at 16%" },
 ];
 
 const contrast: React.ReactNode[][] = [
@@ -43,6 +52,16 @@ const contrast: React.ReactNode[][] = [
   [<span key="p"><Code>--fg-muted</Code> on <Code>--fill</Code></span>, "5.78:1", "6.20:1"],
   [<span key="p"><Code>--error</Code> on <Code>--bg</Code></span>, "7.58:1", "7.08:1"],
   [<span key="p"><Code>--error</Code> on <Code>--fill</Code></span>, "6.76:1", "5.98:1"],
+  [<span key="p"><Code>--accent-fg</Code> on <Code>--bg</Code></span>, "5.34:1", "8.66:1"],
+  [<span key="p"><Code>--accent-fg</Code> on <Code>--fill</Code></span>, "4.76:1", "7.31:1"],
+];
+
+const flowKinds: React.ReactNode[][] = [
+  [<Code key="k">input</Code>, "What starts the flow: an email, a file, a request. Ink edge."],
+  [<Code key="k">agent</Code>, "An AI step that reads, sorts or drafts. Accent edge, the only orange step."],
+  [<Code key="k">tool</Code>, "A system the agent looks things up in. Dashed edge."],
+  [<Code key="k">approval</Code>, "A person who checks before the flow goes on. Heavy left edge."],
+  [<Code key="k">output</Code>, "What the flow hands back. Filled with ink."],
 ];
 
 const typeScale = [
@@ -139,8 +158,8 @@ export default function DesignSystem() {
 
         <Section id="color" number="01" title="Color">
           <Text>
-            Ink, paper, and three grays. The red is for error states and nothing else. Components use the semantic
-            tokens below, which flip between light and dark.
+            Ink, paper, and three grays, plus the orange accent for shapes and moving light. The red is for error
+            states and nothing else. Components use the semantic tokens below, which flip between light and dark.
           </Text>
           <div className="grid gap-4 md:grid-cols-2">
             {themes.map((t) => (
@@ -344,10 +363,120 @@ export default function DesignSystem() {
 
         <Section id="motion" number="07" title="Motion">
           <Text>
-            No decorative motion. Links and buttons change color or underline over <Code>--duration</Code>, 150ms, and that drops
-            to 0ms when the system asks for reduced motion. Animated process flows are planned for later and will
-            follow the same rule.
+            Links and buttons change color or underline over <Code>--duration</Code>, 150ms. The effects and the agent
+            flow below move on their own. All of it stops when the system asks for reduced motion: the effects draw a
+            still frame and the flow drops its moving lights. Effects also pause while they are off screen.
           </Text>
+        </Section>
+
+        <Section id="effects" number="08" title="Effects">
+          <Text>
+            The background effects from the first landing page, redrawn in the tokens. Each fills a positioned area
+            behind its content and is hidden from screen readers. Import each one from its own file in{" "}
+            <Code>src/components/effects</Code>.
+          </Text>
+
+          <Demo name="BackgroundBeams">
+            <div className="grid gap-4 md:grid-cols-2">
+              {themes.map((t) => (
+                <div key={t} data-theme={t} className="relative h-64 overflow-hidden border border-rule bg-bg text-fg">
+                  <BackgroundBeams />
+                  <p className="relative p-5 font-mono text-xs text-fg-muted">{t}</p>
+                </div>
+              ))}
+            </div>
+            <Table
+              caption="Props"
+              captionVisible
+              columns={["Prop", "Default", "What it does"]}
+              rows={[
+                [<Code key="p">count</Code>, "20", "Curves that carry a moving light, out of 58. Fewer is lighter on phones."],
+                [<Code key="p">speed</Code>, "20", "Seconds for the slowest light to cross."],
+                [<Code key="p">className</Code>, "", "Added to the layer. It fills its nearest positioned parent."],
+              ]}
+            />
+          </Demo>
+
+          <Demo name="BackgroundBeamsWithCollision">
+            <div className="grid gap-4 md:grid-cols-2">
+              {themes.map((t) => (
+                <div key={t} data-theme={t} className="border border-rule bg-bg text-fg">
+                  <BackgroundBeamsWithCollision className="h-64">
+                    <p className="text-lg font-semibold">Lights meet the floor</p>
+                  </BackgroundBeamsWithCollision>
+                </div>
+              ))}
+            </div>
+            <Table
+              caption="Props"
+              captionVisible
+              columns={["Prop", "Default", "What it does"]}
+              rows={[
+                [<Code key="p">children</Code>, "", "Centred over the lights."],
+                [<Code key="p">beams</Code>, "7 lights", "Each light: x in percent, duration, delay, repeatDelay, length in pixels."],
+                [<Code key="p">className</Code>, "", "Sets the height. The first landing page used h-96 md:h-[40rem]."],
+              ]}
+            />
+          </Demo>
+
+          <Demo name="BackgroundLines">
+            <div className="grid gap-4 md:grid-cols-2">
+              {themes.map((t) => (
+                <div key={t} data-theme={t} className="border border-rule bg-bg text-fg">
+                  <BackgroundLines className="grid h-64 place-items-center">
+                    <p className="text-lg font-semibold">From one point outward</p>
+                  </BackgroundLines>
+                </div>
+              ))}
+            </div>
+            <Table
+              caption="Props"
+              captionVisible
+              columns={["Prop", "Default", "What it does"]}
+              rows={[
+                [<Code key="p">children</Code>, "", "Drawn over the lines."],
+                [<Code key="p">duration</Code>, "10", "Seconds for one run along a line."],
+                [<Code key="p">layers</Code>, "1", "2 adds a thicker second stroke, as on the first landing page."],
+                [<Code key="p">className</Code>, "", "Sets the size and layout of the area."],
+              ]}
+            />
+          </Demo>
+        </Section>
+
+        <Section id="agent-flow" number="09" title="Agent flow">
+          <Text>
+            <Code>AgentFlow</Code> draws a flow definition with React Flow. The definition is plain data in{" "}
+            <Code>src/lib/flow/definition.ts</Code>, a file with no React in it, so client process flow diagrams can
+            use the same shape. Steps are never editable. Wide screens can pan and zoom; narrow boxes and phones get a top to bottom
+            layout that fits and lets the page scroll. Every flow also renders its steps as a text list for screen
+            readers.
+          </Text>
+
+          <Demo name="AgentFlow">
+            {themes.map((t) => (
+              <div key={t} data-theme={t} className="border border-rule bg-bg p-4 text-fg md:p-6">
+                <AgentFlow flow={drawingReviewFlow} />
+              </div>
+            ))}
+            <AgentFlow flow={rfiFlow} direction="vertical" interactive={false} />
+            <Table caption="Step kinds" captionVisible columns={["Kind", "Meaning and look"]} rows={flowKinds} />
+            <Table
+              caption="Props"
+              captionVisible
+              columns={["Prop", "Default", "What it does"]}
+              rows={[
+                [<Code key="p">flow</Code>, "", "A FlowDefinition: nodes and edges as data. Edges of kind loop go back to an earlier step."],
+                [<Code key="p">direction</Code>, "auto", "horizontal, vertical, or auto: across when every step fits at a readable size, down otherwise."],
+                [<Code key="p">interactive</Code>, "true", "Pan, zoom and view buttons on wide screens. Off keeps the flow fixed."],
+                [<Code key="p">animated</Code>, "true", "Lights travel along the arrows. Off with reduced motion."],
+                [<Code key="p">height</Code>, "fits the flow", "Height of the canvas."],
+              ]}
+            />
+            <Text variant="small" muted>
+              Example flows carry <Code>example: true</Code> and show the Example tag. They describe generic
+              engineering firm work, not a client.
+            </Text>
+          </Demo>
         </Section>
       </main>
 
