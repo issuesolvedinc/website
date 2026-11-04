@@ -1,5 +1,5 @@
 import { cx } from "@/lib/cx";
-import { NODE_KIND_LABEL, type FlowDefinition, type FlowNode } from "@/lib/flow/definition";
+import { stepLabel, type FlowDefinition, type FlowNode } from "@/lib/flow/definition";
 
 /** The flow as a numbered list: every step, then where it leads. Real HTML for screen readers and search engines. */
 export function FlowSteps({ flow, steps, className }: { flow: FlowDefinition; steps: FlowNode[]; className?: string }) {
@@ -14,7 +14,7 @@ export function FlowSteps({ flow, steps, className }: { flow: FlowDefinition; st
           const next = flow.edges.filter((e) => e.from === s.id);
           return (
             <li key={s.id}>
-              {NODE_KIND_LABEL[s.kind]}: {s.title}.{s.detail ? ` ${s.detail}.` : ""}
+              {stepLabel(s)}: {s.title}.{s.detail ? ` ${s.detail}.` : ""}
               {next.map((e) => (
                 <span key={e.id}>
                   {" "}

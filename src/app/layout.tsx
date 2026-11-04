@@ -18,8 +18,8 @@ const mono = Courier_Prime({
 
 export const metadata: Metadata = {
   title: "IssueSolved",
-  description:
-    "IssueSolved builds and runs the AI workflows, automations, and cloud backends that fit how your business already works.",
+  // Neutral on purpose: the site names no services for now.
+  description: "Example process flows: people and AI agents working together, one step at a time.",
 };
 
 export const viewport: Viewport = {

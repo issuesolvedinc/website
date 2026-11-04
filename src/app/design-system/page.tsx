@@ -59,6 +59,7 @@ const contrast: React.ReactNode[][] = [
 const flowKinds: React.ReactNode[][] = [
   [<Code key="k">input</Code>, "What starts the flow: an email, a file, a request. Ink edge."],
   [<Code key="k">agent</Code>, "An AI step that reads, sorts or drafts. Accent edge, the only orange step."],
+  [<Code key="k">person</Code>, "A team member doing the work. Ink edge on the fill color. Its role, such as Engineer, names it."],
   [<Code key="k">tool</Code>, "A system the agent looks things up in. Dashed edge."],
   [<Code key="k">approval</Code>, "A person who checks before the flow goes on. Heavy left edge."],
   [<Code key="k">output</Code>, "What the flow hands back. Filled with ink."],
@@ -322,16 +323,16 @@ export default function DesignSystem() {
           <Demo name="Table">
             <Table
               caption="Example table"
-              columns={["Offering", "What it means"]}
+              columns={["Step", "Who does it"]}
               rows={[
-                ["Workflow delivery", "We take the way your team already works and build it into a workflow."],
-                ["Cloud platform", "We build and run the backend your apps need."],
+                ["Drafts comments", "An agent, against the firm's checklist."],
+                ["Checks the comments", "An engineer, who approves or sends them back."],
               ]}
             />
           </Demo>
 
           <Demo name="Note">
-            <Note title="Note">We maintain what we build and fix it when something breaks.</Note>
+            <Note title="Note">A note sits apart from the text around it, on the fill color.</Note>
             <Note title="Error" tone="error">
               Something went wrong. The red is reserved for messages like this one.
             </Note>
@@ -340,8 +341,8 @@ export default function DesignSystem() {
           <Demo name="Numbered list">
             <NumberedList
               items={[
-                { title: "One point of contact.", text: "You talk to IssueSolved, not to a chain of people or tools." },
-                { title: "Your work stays yours.", text: "Each client's work is kept separate and never shared." },
+                { title: "A bold lead.", text: "Then the rest of the item in regular weight." },
+                { title: "A second item.", text: "Numbers sit in the typewriter face." },
               ]}
             />
           </Demo>
@@ -470,6 +471,9 @@ export default function DesignSystem() {
                 [<Code key="p">interactive</Code>, "true", "Pan, zoom and view buttons on wide screens. Off keeps the flow fixed."],
                 [<Code key="p">animated</Code>, "true", "Lights travel along the arrows. Off with reduced motion."],
                 [<Code key="p">height</Code>, "fits the flow", "Height of the canvas."],
+                [<Code key="p">running</Code>, "false", "Lights one step at a time while on screen. Off with reduced motion."],
+                [<Code key="p">caption</Code>, "true", "The title and Example tag above the canvas."],
+                [<Code key="p">textList</Code>, "true", "The steps as a list for screen readers. Off only where the page shows them as text."],
               ]}
             />
             <Text variant="small" muted>

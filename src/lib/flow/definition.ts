@@ -6,8 +6,11 @@
 
 export const FLOW_DEFINITION_VERSION = 1;
 
-/** What a step is. Each kind has its own look in the diagram. */
-export type FlowNodeKind = "input" | "agent" | "tool" | "approval" | "output";
+/**
+ * What a step is. Each kind has its own look in the diagram.
+ * "person" is a team member doing the work; "approval" is a team member deciding whether the flow goes on.
+ */
+export type FlowNodeKind = "input" | "agent" | "person" | "tool" | "approval" | "output";
 
 export type FlowNode = {
   id: string;
@@ -15,6 +18,8 @@ export type FlowNode = {
   title: string;
   /** One short line under the title. */
   detail?: string;
+  /** Who does the step, for example "Engineer" or "Project manager". Shown in place of the kind's name. */
+  role?: string;
   /** Fixed position in diagram units. Leave it out and layoutFlow places the node. */
   position?: { x: number; y: number };
 };
@@ -44,10 +49,16 @@ export type FlowDirection = "horizontal" | "vertical";
 export const NODE_KIND_LABEL: Record<FlowNodeKind, string> = {
   input: "Input",
   agent: "Agent",
+  person: "Person",
   tool: "Tool",
   approval: "Approval",
   output: "Output",
 };
+
+/** The name shown on a step: its role when it has one, else its kind. */
+export function stepLabel(node: FlowNode): string {
+  return node.role ?? NODE_KIND_LABEL[node.kind];
+}
 
 /** Returns the problems in a definition. An empty list means it can be drawn. */
 export function validateFlow(def: FlowDefinition): string[] {

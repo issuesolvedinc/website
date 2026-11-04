@@ -21,10 +21,10 @@ import {
 } from "@xyflow/react";
 import { cx } from "@/lib/cx";
 import {
-  NODE_KIND_LABEL,
   countRanks,
   layoutFlow,
   orderSteps,
+  stepLabel,
   type FlowDefinition,
   type FlowDirection,
   type FlowNode,
@@ -46,10 +46,16 @@ export type AgentFlowProps = {
   animated?: boolean;
   /** Height of the canvas. Defaults to a height that fits the flow in its direction. */
   height?: number | string;
+  /** Lights up one step at a time, in reading order, while the flow is on screen. Off with reduced motion. */
+  running?: boolean;
+  /** Renders the steps as a list for screen readers. Turn off only when the page already shows them as text. */
+  textList?: boolean;
+  /** Shows the flow's title and Example tag above the canvas. Turn off when the section heading already does. */
+  caption?: boolean;
   className?: string;
 };
 
-type StepData = { step: FlowNode; direction: FlowDirection };
+type StepData = { step: FlowNode; direction: FlowDirection; active: boolean };
 type LinkData = { label?: string; loop: boolean; animated: boolean };
 type StepNode = Node<StepData, "step">;
 type LinkEdge = Edge<LinkData, "link">;
@@ -69,7 +75,17 @@ export function AgentFlow(props: AgentFlowProps) {
   );
 }
 
-function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animated = true, height, className }: AgentFlowProps) {
+function AgentFlowCanvas({
+  flow,
+  direction = "auto",
+  interactive = true,
+  animated = true,
+  height,
+  running = false,
+  textList = true,
+  caption = true,
+  className,
+}: AgentFlowProps) {
   const narrow = useMediaQuery("(max-width: 40rem)");
   const reduced = usePrefersReducedMotion();
   const frame = useRef<HTMLElement>(null);
@@ -88,6 +104,26 @@ function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animate
   const moving = animated && !reduced;
   const explore = interactive && !narrow;
   const { fitView, zoomIn, zoomOut } = useReactFlow();
+
+  // The running highlight: one step at a time, only while the flow is on screen.
+  const steps = useMemo(() => orderSteps(flow), [flow]);
+  const [tick, setTick] = useState(0);
+  const [onScreen, setOnScreen] = useState(false);
+  useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => setTick(0), [flow]);
+  const run = running && moving && onScreen;
+  useEffect(() => {
+    if (!run) return;
+    const t = setInterval(() => setTick((n) => n + 1), 1700);
+    return () => clearInterval(t);
+  }, [run]);
+  const activeId = run ? steps[tick % steps.length]?.id : undefined;
   const box = useRef<HTMLDivElement>(null);
 
   const { nodes, edges } = useMemo(() => {
@@ -96,8 +132,8 @@ function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animate
       id: n.id,
       type: "step",
       position: at.get(n.id) ?? { x: 0, y: 0 },
-      data: { step: n, direction: dir },
-      ariaLabel: `${NODE_KIND_LABEL[n.kind]}: ${n.title}${n.detail ? `. ${n.detail}` : ""}`,
+      data: { step: n, direction: dir, active: n.id === activeId },
+      ariaLabel: `${stepLabel(n)}: ${n.title}${n.detail ? `. ${n.detail}` : ""}`,
       width: NODE_WIDTH,
     }));
     const edges: LinkEdge[] = flow.edges.map((e) => {
@@ -114,7 +150,7 @@ function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animate
       };
     });
     return { nodes, edges };
-  }, [flow, dir, moving]);
+  }, [flow, dir, moving, activeId]);
 
   // Fit again when the box changes size or the direction flips.
   useEffect(() => {
@@ -129,7 +165,7 @@ function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animate
 
   return (
     <figure ref={frame} className={cx("agent-flow", className)}>
-      <div className="flex items-baseline justify-between gap-4 pb-3">
+      <div className={cx("flex items-baseline justify-between gap-4 pb-3", !caption && "sr-only")}>
         <figcaption className="text-sm font-semibold text-fg">{flow.title}</figcaption>
         {flow.example && <span className="af-tag">Example</span>}
       </div>
@@ -181,23 +217,23 @@ function AgentFlowCanvas({ flow, direction = "auto", interactive = true, animate
           </div>
         )}
       </div>
-      <FlowSteps flow={flow} steps={orderSteps(flow)} className="sr-only" />
+      {textList && <FlowSteps flow={flow} steps={steps} className="sr-only" />}
     </figure>
   );
 }
 
 function StepView({ data }: NodeProps<StepNode>) {
-  const { step, direction } = data;
+  const { step, direction, active } = data;
   const across = direction === "horizontal";
   return (
-    <div className={cx("af-node", `af-${step.kind}`)}>
+    <div className={cx("af-node", `af-${step.kind}`, active && "af-active")}>
       <Handle id="in" type="target" position={across ? Position.Left : Position.Top} className="af-handle" isConnectable={false} />
       <Handle id="out" type="source" position={across ? Position.Right : Position.Bottom} className="af-handle" isConnectable={false} />
       <Handle id="loop-in" type="target" position={across ? Position.Bottom : Position.Left} className="af-handle" isConnectable={false} />
       <Handle id="loop-out" type="source" position={across ? Position.Bottom : Position.Left} className="af-handle" isConnectable={false} />
       <span className="af-kind">
         <KindIcon kind={step.kind} />
-        {NODE_KIND_LABEL[step.kind]}
+        {stepLabel(step)}
       </span>
       <span className="af-title">{step.title}</span>
       {step.detail && <span className="af-detail">{step.detail}</span>}

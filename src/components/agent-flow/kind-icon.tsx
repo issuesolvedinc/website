@@ -11,6 +11,12 @@ export function KindIcon({ kind }: { kind: FlowNodeKind }) {
           <path d="M8 1.5v2.3M8 12.2v2.3M1.5 8h2.3M12.2 8h2.3M3.4 3.4l1.6 1.6M11 11l1.6 1.6M3.4 12.6 5 11M11 5l1.6-1.6" />
         </>
       )}
+      {kind === "person" && (
+        <>
+          <circle cx="8" cy="5" r="2.5" />
+          <path d="M3 14c.6-2.8 2.6-4.2 5-4.2s4.4 1.4 5 4.2" />
+        </>
+      )}
       {kind === "tool" && <path d="M10.5 2.5a3 3 0 0 0-3.6 3.9L2.5 10.8l2.7 2.7 4.4-4.4a3 3 0 0 0 3.9-3.6l-1.9 1.9-1.9-.5-.5-1.9z" />}
       {kind === "approval" && (
         <>

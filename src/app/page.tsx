@@ -1,97 +1,117 @@
-import { Container, Label, NumberedList, Note, ProcessFlow, Rule, Section, Table, Text, TextLink, Wordmark } from "@/components";
+import { Label, TextLink, Wordmark } from "@/components";
+import { FlowPanel, InlineFlow } from "@/components/home/flow-panel";
+import { showcaseFlows } from "@/content/example-flows";
+import { stepLabel, orderSteps, type FlowDefinition } from "@/lib/flow/definition";
 
-// All copy comes from the Core Identity note, sections 1, 3, 4 and 8.
-// "Fixed price for the build" is left out until it is confirmed.
+// Direction B: a running flow beside the page follows the reader.
+// The site names no services for now (identity note, change of 2026-11-04): only the wordmark, the example flows
+// and the contact email. The flows show people and AI agents at work and leave the rest to the reader.
 
 const EMAIL = "contact@issuesolved.ca";
 
 export default function Home() {
   return (
-    <>
-      <header>
-        <Container className="pb-16 pt-16 md:pb-24 md:pt-24">
-          <h1>
-            <Wordmark className="w-full max-w-[34rem]" />
-          </h1>
-          <p className="mt-10 max-w-[var(--measure)] text-pretty text-xl md:text-2xl">
-            IssueSolved builds and runs the AI workflows, automations, and cloud backends that fit how your business
-            already works.
-          </p>
-        </Container>
-      </header>
+    <div className="lg:grid lg:grid-cols-[minmax(22rem,34rem)_minmax(0,1fr)]">
+      <aside data-theme="dark" className="hidden border-r border-rule bg-bg text-fg lg:block">
+        <div className="sticky top-0 h-screen overflow-hidden">
+          <FlowPanel flows={showcaseFlows} />
+        </div>
+      </aside>
 
-      <main>
-        <Section id="how-it-works" number="01" title="How it works">
-          <Text>
-            You deal with one company and one contact. You already have the knowledge, the skills, and the tools. We
-            turn the way your team works into a workflow that runs from start to finish, and we keep it running. The
-            complexity stays with us.
-          </Text>
-          <ProcessFlow
-            className="pt-2"
-            caption="Client, then IssueSolved, then the work behind it"
-            steps={[
-              { title: "Client", detail: "Your team, your knowledge, your tools." },
-              { title: "IssueSolved", detail: "One contact. We build it and keep it working.", weight: "strong" },
-              {
-                title: "The work behind it",
-                detail: "Workflows, automations, and cloud backends.",
-                weight: "quiet",
-              },
-            ]}
-          />
-        </Section>
+      <div className="min-w-0">
+        <header className="flex flex-wrap items-center justify-between gap-4 px-[var(--gutter)] pt-6">
+          <span className="flex items-center gap-4">
+            <Wordmark className="w-36" />
+            <Label>Process flows</Label>
+          </span>
+          <TextLink href={`mailto:${EMAIL}`} className="font-mono text-sm">
+            {EMAIL}
+          </TextLink>
+        </header>
 
-        <Section id="what-we-do" number="02" title="Cloud and AI platform engineering">
-          <Table
-            caption="Our three offerings"
-            columns={["Offering", "What it means"]}
-            rows={[
-              [
-                "Workflow delivery",
-                "We take the way your team already works and build it into a workflow that runs end to end.",
-              ],
-              ["Tailored automations", "We automate the repeated steps that are specific to your business."],
-              ["Cloud platform", "We build and run the backend your apps need."],
-            ]}
-          />
-          <Note title="Across all three">
-            We keep what we build working. We maintain it and fix it when something breaks.
-          </Note>
-        </Section>
+        <main className="px-[var(--gutter)]">
+          <section aria-labelledby="intro" className="max-w-[44rem] py-16 md:py-24">
+            <h1 id="intro" className="text-pretty text-3xl font-semibold md:text-[3.5rem] md:leading-[1.05]">
+              People and AI agents, one step at a time.
+            </h1>
+            <p className="mt-6 max-w-[var(--measure)] text-lg text-fg-muted">
+              Four example flows from engineering work. Each one shows who does a step, who checks it, and where it
+              goes next.
+            </p>
+          </section>
 
-        <Section id="how-we-work" number="03" title="How we work">
-          <NumberedList
-            items={[
-              {
-                title: "Every delivery comes with a process flow diagram.",
-                text: "You see how your workflow runs, step by step.",
-              },
-              { title: "We keep it working.", text: "Maintenance and debugging are part of what we deliver." },
-              { title: "One point of contact.", text: "You talk to IssueSolved, not to a chain of people or tools." },
-              { title: "Your work stays yours.", text: "Each client's work is kept separate and never shared." },
-            ]}
-          />
-        </Section>
+          {showcaseFlows.map((flow, i) => (
+            <FlowSection key={flow.id} flow={flow} number={i + 1} />
+          ))}
 
-        <Section id="contact" number="04" title="Contact">
-          <Text>Write to us by email.</Text>
-          <p className="text-xl md:text-2xl">
-            <TextLink href={`mailto:${EMAIL}`} className="break-words">
-              {EMAIL}
-            </TextLink>
-          </p>
-        </Section>
-      </main>
+          <section aria-labelledby="contact" className="border-t border-rule py-16 md:py-24">
+            <h2 id="contact" className="text-2xl font-semibold">
+              Contact
+            </h2>
+            <p className="mt-4 text-xl md:text-2xl">
+              <TextLink href={`mailto:${EMAIL}`} className="break-words">
+                {EMAIL}
+              </TextLink>
+            </p>
+          </section>
+        </main>
 
-      <footer>
-        <Container className="pb-12">
-          <Rule />
-          <Label as="p" className="pt-6">
+        <footer className="px-[var(--gutter)] pb-10">
+          <Label as="p" className="border-t border-rule pt-6">
             &copy; {new Date().getFullYear()} IssueSolved Inc.
           </Label>
-        </Container>
-      </footer>
-    </>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+/** One example flow: its steps as text, and on smaller screens the diagram itself. */
+function FlowSection({ flow, number }: { flow: FlowDefinition; number: number }) {
+  const steps = orderSteps(flow);
+  const byId = new Map(flow.nodes.map((n) => [n.id, n]));
+  const loops = flow.edges.filter((e) => e.kind === "loop");
+  const headingId = `${flow.id}-title`;
+  return (
+    <section data-flow-id={flow.id} aria-labelledby={headingId} className="border-t border-rule py-14 md:py-20">
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+        <Label as="p">{String(number).padStart(2, "0")}</Label>
+        <h2 id={headingId} className="text-2xl font-semibold md:text-3xl">
+          {flow.title}
+        </h2>
+        {flow.example && (
+          <span className="border border-accent-fg px-1.5 font-mono text-xs text-accent-fg">Example</span>
+        )}
+      </div>
+
+      <div className="mt-8">
+        <InlineFlow flow={flow} />
+      </div>
+
+      <ol className="mt-8 grid max-w-[44rem] gap-0 lg:mt-0">
+        {steps.map((s, i) => (
+          <li key={s.id} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-3 border-b border-rule py-4 last:border-b-0">
+            <span className="pt-1 font-mono text-xs text-fg-muted">{i + 1}</span>
+            <span>
+              <span
+                className={
+                  s.kind === "agent" ? "block font-mono text-xs text-accent-fg" : "block font-mono text-xs text-fg-muted"
+                }
+              >
+                {stepLabel(s)}
+              </span>
+              <span className="block text-lg font-semibold">{s.title}</span>
+              {s.detail && <span className="block text-fg-muted">{s.detail}</span>}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {loops.map((e) => (
+        <p key={e.id} className="mt-4 max-w-[44rem] text-fg-muted">
+          {e.label ? `${e.label}: ` : ""}the {stepLabel(byId.get(e.from)!).toLowerCase()} sends it back to the step
+          &ldquo;{byId.get(e.to)?.title}&rdquo;.
+        </p>
+      ))}
+    </section>
   );
 }

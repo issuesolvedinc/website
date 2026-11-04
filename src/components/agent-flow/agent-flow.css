@@ -72,6 +72,13 @@
 .af-agent .af-kind {
   color: var(--accent-fg);
 }
+.af-person {
+  border-color: var(--fg);
+  background: color-mix(in srgb, var(--fill) 82%, transparent);
+}
+.af-person .af-kind {
+  color: var(--fg);
+}
 .af-tool {
   border-style: dashed;
   border-color: var(--rule);
@@ -88,6 +95,23 @@
 .af-output .af-kind,
 .af-output .af-detail {
   color: color-mix(in srgb, var(--bg) 78%, transparent);
+}
+
+/* The running highlight */
+.af-node {
+  transition: box-shadow 300ms ease, transform 300ms ease;
+}
+.af-active {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+  transform: translateY(-2px);
+}
+.af-agent.af-active {
+  box-shadow: inset 3px 0 0 var(--accent), 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .af-node {
+    transition: none;
+  }
 }
 
 .af-handle {
