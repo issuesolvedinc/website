@@ -1,71 +1,122 @@
-/* The office seen from above: walls, desks and people in the page's ink, work in blue. */
+/*
+  The flow canvas: a grid, nodes with a title bar and ports, and curved wires. Every shade is the page's ink
+  mixed into the page colour, so light and dark both work; the one colour is --flow, for the work.
+*/
+.ow * {
+  vector-effect: non-scaling-stroke;
+}
+.ow .ow-canvas {
+  fill: color-mix(in srgb, var(--fg) 3%, var(--bg));
+}
 .ow .ow-frame {
   fill: none;
-  stroke: var(--fg);
-  stroke-width: 2;
-}
-.ow .ow-wall {
-  fill: none;
-  stroke: var(--fg);
-  stroke-width: 1.25;
-}
-/* A door: the wall is painted over in the page colour. */
-.ow .ow-gap {
-  stroke: var(--bg);
-  stroke-width: 3;
-}
-.ow .ow-desk {
-  fill: var(--fill);
-  stroke: var(--fg);
+  stroke: color-mix(in srgb, var(--fg) 22%, transparent);
   stroke-width: 1;
 }
-.ow .ow-figure {
+.ow .ow-grid-minor {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 6%, transparent);
+  stroke-width: 1;
+}
+.ow .ow-grid-major {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 11%, transparent);
+  stroke-width: 1;
+}
+
+/* Wires: a quiet line, with work marching along it while something travels. */
+.ow .ow-wire {
+  transition: opacity 700ms ease;
+}
+.ow .ow-wire path {
+  fill: none;
+  stroke-linecap: round;
+}
+.ow .ow-wire-base {
+  stroke: color-mix(in srgb, var(--fg) 45%, transparent);
+  stroke-width: 1.5;
+}
+.ow .ow-wire-flow {
+  stroke: var(--flow);
+  stroke-width: 2;
+  stroke-dasharray: 2 10;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  animation: ow-march 0.9s linear infinite;
+}
+.ow .ow-wire-live .ow-wire-flow {
+  opacity: 1;
+}
+.ow .ow-wire-off {
+  opacity: 0.1;
+}
+@keyframes ow-march {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+/* Nodes */
+.ow .ow-node {
+  transition: opacity 700ms ease;
+}
+.ow .ow-off {
+  opacity: 0.35;
+}
+.ow .ow-box {
   fill: var(--bg);
-  stroke: var(--fg);
+  stroke: color-mix(in srgb, var(--fg) 70%, transparent);
+  stroke-width: 1.25;
+  transition: stroke 250ms ease;
+}
+.ow .ow-busy .ow-box {
+  stroke: var(--flow);
   stroke-width: 2;
 }
-.ow .ow-stroke {
-  fill: none;
+.ow .ow-head {
+  fill: color-mix(in srgb, var(--fg) 6%, var(--bg));
+}
+.ow .ow-rule {
+  stroke: color-mix(in srgb, var(--fg) 18%, transparent);
+  stroke-width: 1;
+}
+.ow .ow-title {
+  fill: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+.ow .ow-status {
+  fill: color-mix(in srgb, var(--fg) 22%, transparent);
+  transition: fill 250ms ease;
+}
+.ow .ow-busy .ow-status {
+  fill: var(--flow);
+}
+.ow .ow-port {
+  fill: var(--bg);
   stroke: var(--fg);
   stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 .ow .ow-ink {
   fill: var(--fg);
 }
-.ow .ow-track {
+.ow .ow-line,
+.ow .ow-line rect,
+.ow .ow-line path {
   fill: none;
-  stroke: var(--flow);
-  stroke-width: 1;
-  stroke-dasharray: 2 5;
-  opacity: 0.55;
-  transition: opacity 900ms ease;
+  stroke: var(--fg);
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
-.ow .ow-work {
+
+/* The work */
+.ow .ow-item {
   fill: var(--flow);
 }
-.ow .ow-fade {
-  transition: opacity 900ms ease;
-}
-.ow .ow-hidden {
-  opacity: 0;
-}
-.ow .ow-spin {
-  animation: ow-spin 1.2s linear infinite;
-}
-@keyframes ow-spin {
-  to {
-    transform: rotate(90deg);
-  }
-}
-.ow .ow-label {
-  fill: var(--fg-muted);
-  font-family: var(--font-mono);
-  font-size: 12px;
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .ow .ow-spin {
+  .ow .ow-wire-flow {
     animation: none;
   }
 }

@@ -11,8 +11,8 @@ import {
 
 // The headline is the only line on the site that says what IssueSolved does (identity note, change of 2026-11-05).
 // Everything else from the change of 2026-11-04 holds: no services list, no offerings, no promises. Under the
-// headline, a small office in black and white plays on its own: work (in blue) piles up at one person,
-// then an agent joins and the pile goes down. Nothing to click.
+// headline (beside it on wide screens), a small office in isometric view plays on its own: work (in blue)
+// piles up at one person, then an agent joins and the pile goes down. Nothing to click.
 // The example flows follow in direction B: a running flow beside the page follows the reader.
 
 const EMAIL = "contact@issuesolved.ca";
@@ -32,17 +32,15 @@ export default function Home() {
 
       <section
         aria-labelledby="headline"
-        className="px-[var(--gutter)] pb-16 pt-14 md:pb-24 md:pt-20"
+        className="grid items-center gap-10 px-[var(--gutter)] pb-16 pt-14 md:pb-24 md:pt-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6"
       >
         <h1
           id="headline"
-          className="max-w-[52rem] text-pretty text-3xl font-semibold md:text-[3.5rem] md:leading-[1.05]"
+          className="max-w-[52rem] text-pretty text-3xl font-semibold md:text-[3.5rem] md:leading-[1.05] lg:text-[3rem] xl:text-[3.5rem]"
         >
           {HEADLINE}
         </h1>
-        <div className="mt-10 md:mt-14">
-          <OfficeWorld className="max-w-[60rem]" />
-        </div>
+        <OfficeWorld />
       </section>
 
       <div className="border-t border-rule lg:grid lg:grid-cols-[minmax(22rem,34rem)_minmax(0,1fr)]">
