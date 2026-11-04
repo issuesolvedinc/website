@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Courier_Prime, Source_Serif_4 } from "next/font/google";
+import { HEADLINE } from "@/content/headline";
 import "./globals.css";
 
 const serif = Source_Serif_4({
@@ -17,9 +18,9 @@ const mono = Courier_Prime({
 });
 
 export const metadata: Metadata = {
-  title: "IssueSolved",
-  // Neutral on purpose: the site names no services for now.
-  description: "Example process flows: people and AI agents working together, one step at a time.",
+  title: `IssueSolved | ${HEADLINE.replace(/\.$/, "")}`,
+  // The headline is the only line that says what IssueSolved does; no services are named.
+  description: HEADLINE,
 };
 
 export const viewport: Viewport = {

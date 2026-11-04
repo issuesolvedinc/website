@@ -22,7 +22,18 @@ export type FlowNode = {
   role?: string;
   /** Fixed position in diagram units. Leave it out and layoutFlow places the node. */
   position?: { x: number; y: number };
+  /**
+   * Work items waiting at this step. Drawn as a stack with its count, so a bottleneck shows as a pile.
+   * A picture of the flow, not a measurement: leave it out for steps that keep up.
+   */
+  queue?: number;
 };
+
+/**
+ * How much work moves along an arrow. Drawn as moving items: "slow" one at a time, "steady" a few,
+ * "busy" a close stream. Leave it out for a single light.
+ */
+export type FlowPace = "slow" | "steady" | "busy";
 
 export type FlowEdge = {
   id: string;
@@ -32,6 +43,7 @@ export type FlowEdge = {
   label?: string;
   /** "loop" goes back to an earlier step, for example when a reviewer asks for changes. */
   kind?: "next" | "loop";
+  pace?: FlowPace;
 };
 
 export type FlowDefinition = {
@@ -42,6 +54,20 @@ export type FlowDefinition = {
   example?: boolean;
   nodes: FlowNode[];
   edges: FlowEdge[];
+};
+
+/**
+ * The same flow at two moments, for example before and after an agent takes part of the work.
+ * Both sides should share node ids so a diagram can turn one into the other in place.
+ */
+export type FlowChange = {
+  id: string;
+  title: string;
+  example?: boolean;
+  before: FlowDefinition;
+  after: FlowDefinition;
+  /** Short names for the two sides, shown on the switch. */
+  labels: { before: string; after: string };
 };
 
 export type FlowDirection = "horizontal" | "vertical";
@@ -72,7 +98,17 @@ export function validateFlow(def: FlowDefinition): string[] {
     if (!ids.has(e.from)) problems.push(`Edge "${e.id}" starts at a missing node "${e.from}".`);
     if (!ids.has(e.to)) problems.push(`Edge "${e.id}" ends at a missing node "${e.to}".`);
   }
+  for (const n of def.nodes) {
+    if (n.queue !== undefined && (!Number.isInteger(n.queue) || n.queue < 0)) problems.push(`Node "${n.id}" has a queue that is not a whole number.`);
+  }
   return problems;
+}
+
+/** The node ids the two sides of a change do not share. An empty list means one can turn into the other in place. */
+export function unsharedNodes(change: FlowChange): string[] {
+  const a = new Set(change.before.nodes.map((n) => n.id));
+  const b = new Set(change.after.nodes.map((n) => n.id));
+  return [...a].filter((id) => !b.has(id)).concat([...b].filter((id) => !a.has(id)));
 }
 
 /** Edges that move the flow forward. Loops are drawn but do not decide the order. */

@@ -28,6 +28,7 @@ import {
   type FlowDefinition,
   type FlowDirection,
   type FlowNode,
+  type FlowPace,
 } from "@/lib/flow/definition";
 import { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
 import { FlowSteps } from "./flow-steps";
@@ -52,11 +53,13 @@ export type AgentFlowProps = {
   textList?: boolean;
   /** Shows the flow's title and Example tag above the canvas. Turn off when the section heading already does. */
   caption?: boolean;
+  /** Live queue counts by node id, for an animation that fills or drains a step. Falls back to each node's own queue. */
+  queues?: Record<string, number>;
   className?: string;
 };
 
-type StepData = { step: FlowNode; direction: FlowDirection; active: boolean };
-type LinkData = { label?: string; loop: boolean; animated: boolean };
+type StepData = { step: FlowNode; direction: FlowDirection; active: boolean; queue: number };
+type LinkData = { label?: string; loop: boolean; animated: boolean; pace?: FlowPace };
 type StepNode = Node<StepData, "step">;
 type LinkEdge = Edge<LinkData, "link">;
 
@@ -84,6 +87,7 @@ function AgentFlowCanvas({
   running = false,
   textList = true,
   caption = true,
+  queues,
   className,
 }: AgentFlowProps) {
   const narrow = useMediaQuery("(max-width: 40rem)");
@@ -126,14 +130,17 @@ function AgentFlowCanvas({
   const activeId = run ? steps[tick % steps.length]?.id : undefined;
   const box = useRef<HTMLDivElement>(null);
 
+  // A step with a queue is taller, so a flow that has one gets more room between steps when it runs down.
+  const hasQueue = queues !== undefined || flow.nodes.some((n) => n.queue);
+  const downGap = hasQueue ? 210 : 150;
   const { nodes, edges } = useMemo(() => {
-    const at = layoutFlow(flow, { direction: dir, rankGap: dir === "horizontal" ? RANK_GAP : 150 });
+    const at = layoutFlow(flow, { direction: dir, rankGap: dir === "horizontal" ? RANK_GAP : downGap });
     const nodes: StepNode[] = flow.nodes.map((n) => ({
       id: n.id,
       type: "step",
       position: at.get(n.id) ?? { x: 0, y: 0 },
-      data: { step: n, direction: dir, active: n.id === activeId },
-      ariaLabel: `${stepLabel(n)}: ${n.title}${n.detail ? `. ${n.detail}` : ""}`,
+      data: { step: n, direction: dir, active: n.id === activeId, queue: queues?.[n.id] ?? n.queue ?? 0 },
+      ariaLabel: `${stepLabel(n)}: ${n.title}${n.detail ? `. ${n.detail}` : ""}${(queues?.[n.id] ?? n.queue) ? `. ${queues?.[n.id] ?? n.queue} waiting` : ""}`,
       width: NODE_WIDTH,
     }));
     const edges: LinkEdge[] = flow.edges.map((e) => {
@@ -145,12 +152,12 @@ function AgentFlowCanvas({
         type: "link",
         sourceHandle: loop ? "loop-out" : "out",
         targetHandle: loop ? "loop-in" : "in",
-        data: { label: e.label, loop, animated: moving },
+        data: { label: e.label, loop, animated: moving, pace: e.pace },
         focusable: false,
       };
     });
     return { nodes, edges };
-  }, [flow, dir, moving, activeId]);
+  }, [flow, dir, moving, activeId, queues, downGap]);
 
   // Fit again when the box changes size or the direction flips.
   useEffect(() => {
@@ -160,8 +167,14 @@ function AgentFlowCanvas({
     ro.observe(el);
     return () => ro.disconnect();
   }, [fitView, dir]);
+  // And when the steps change, for a flow that turns into another in place.
+  const shape = flow.nodes.map((n) => n.id).join(" ");
+  useEffect(() => {
+    const t = requestAnimationFrame(() => fitView({ ...FIT, duration: 0 }));
+    return () => cancelAnimationFrame(t);
+  }, [fitView, shape]);
 
-  const autoHeight = dir === "horizontal" ? 320 : ranks * 150 + 40;
+  const autoHeight = dir === "horizontal" ? 320 : ranks * downGap + 40;
 
   return (
     <figure ref={frame} className={cx("agent-flow", className)}>
@@ -223,7 +236,7 @@ function AgentFlowCanvas({
 }
 
 function StepView({ data }: NodeProps<StepNode>) {
-  const { step, direction, active } = data;
+  const { step, direction, active, queue } = data;
   const across = direction === "horizontal";
   return (
     <div className={cx("af-node", `af-${step.kind}`, active && "af-active")}>
@@ -237,23 +250,46 @@ function StepView({ data }: NodeProps<StepNode>) {
       </span>
       <span className="af-title">{step.title}</span>
       {step.detail && <span className="af-detail">{step.detail}</span>}
+      {queue > 0 && (
+        <span className="af-queue">
+          <span className="af-pips" aria-hidden="true">
+            {Array.from({ length: Math.min(queue, MAX_PIPS) }, (_, i) => (
+              <i key={i} />
+            ))}
+          </span>
+          <span className="af-count">{queue} waiting</span>
+        </span>
+      )}
     </div>
   );
 }
 
 function LinkView({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data }: EdgeProps<LinkEdge>) {
   const loop = data?.loop ?? false;
+  const pace = data?.pace ? PACE[data.pace] : undefined;
   const [path, labelX, labelY] = loop
     ? getSmoothStepPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset: 36, borderRadius: 12 })
     : getBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
   return (
     <>
       <BaseEdge id={id} path={path} className={cx("af-edge", loop && "af-edge-loop")} />
-      {data?.animated && (
-        <circle r="3.5" className="af-spark">
-          <animateMotion dur={loop ? "3.2s" : "2.4s"} repeatCount="indefinite" path={path} />
-        </circle>
-      )}
+      {data?.animated &&
+        (pace ? (
+          Array.from({ length: pace.items }, (_, i) => (
+            <rect key={`${data.pace}-${i}`} x="-3.5" y="-3.5" width="7" height="7" className="af-item">
+              <animateMotion
+                dur={`${pace.dur}s`}
+                begin={`${(-i * pace.dur) / pace.items}s`}
+                repeatCount="indefinite"
+                path={path}
+              />
+            </rect>
+          ))
+        ) : (
+          <circle r="3.5" className="af-spark">
+            <animateMotion dur={loop ? "3.2s" : "2.4s"} repeatCount="indefinite" path={path} />
+          </circle>
+        ))}
       {data?.label && (
         <EdgeLabelRenderer>
           <span className="af-edge-label" style={{ transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)` }}>
@@ -264,6 +300,15 @@ function LinkView({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targ
     </>
   );
 }
+
+/** Most pips drawn in a queue; the count says the rest. */
+const MAX_PIPS = 10;
+/** Moving work items per arrow, and seconds for one to cross. */
+const PACE: Record<FlowPace, { items: number; dur: number }> = {
+  slow: { items: 1, dur: 4.2 },
+  steady: { items: 2, dur: 2.6 },
+  busy: { items: 4, dur: 1.8 },
+};
 
 const nodeTypes = { step: StepView };
 const edgeTypes = { link: LinkView };
