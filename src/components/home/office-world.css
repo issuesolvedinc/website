@@ -1,11 +1,23 @@
-/* The mini office: figures in the page's ink, work in blue. */
-.ow .ow-line {
+/* The office seen from above: walls, desks and people in the page's ink, work in blue. */
+.ow .ow-frame {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 2;
+}
+.ow .ow-wall {
+  fill: none;
   stroke: var(--fg);
   stroke-width: 1.25;
-  transition: opacity 900ms ease;
 }
-.ow .ow-off {
-  opacity: 0.12;
+/* A door: the wall is painted over in the page colour. */
+.ow .ow-gap {
+  stroke: var(--bg);
+  stroke-width: 3;
+}
+.ow .ow-desk {
+  fill: var(--fill);
+  stroke: var(--fg);
+  stroke-width: 1;
 }
 .ow .ow-figure {
   fill: var(--bg);
@@ -22,15 +34,19 @@
 .ow .ow-ink {
   fill: var(--fg);
 }
+.ow .ow-track {
+  fill: none;
+  stroke: var(--flow);
+  stroke-width: 1;
+  stroke-dasharray: 2 5;
+  opacity: 0.55;
+  transition: opacity 900ms ease;
+}
 .ow .ow-work {
   fill: var(--flow);
 }
-.ow .ow-person,
-.ow .ow-agent {
+.ow .ow-fade {
   transition: opacity 900ms ease;
-}
-.ow .ow-idle {
-  opacity: 0.35;
 }
 .ow .ow-hidden {
   opacity: 0;
@@ -46,7 +62,7 @@
 .ow .ow-label {
   fill: var(--fg-muted);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 12px;
 }
 @media (prefers-reduced-motion: reduce) {
   .ow .ow-spin {
