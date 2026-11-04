@@ -83,7 +83,7 @@
 .ow .ow-title {
   fill: var(--fg);
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 12px;
 }
 .ow .ow-status {
   fill: color-mix(in srgb, var(--fg) 22%, transparent);

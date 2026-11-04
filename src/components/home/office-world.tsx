@@ -33,17 +33,17 @@ type Layout = {
 const HEAD = 26;
 
 const WIDE: Layout = {
-  w: 900,
-  h: 370,
-  nodeW: 164,
-  nodeH: 116,
+  w: 1200,
+  h: 330,
+  nodeW: 150,
+  nodeH: 112,
   flow: "across",
   nodes: {
-    in: { id: "in", title: "Requests", x: 30, y: 210 },
-    a: { id: "a", title: "Coordinator", x: 250, y: 210 },
-    agent: { id: "agent", title: "Agent", x: 250, y: 34 },
-    b: { id: "b", title: "Lead", x: 480, y: 210 },
-    out: { id: "out", title: "Sent", x: 706, y: 210 },
+    in: { id: "in", title: "Requests", x: 50, y: 190 },
+    a: { id: "a", title: "Coordinator", x: 360, y: 190 },
+    agent: { id: "agent", title: "Agent", x: 360, y: 28 },
+    b: { id: "b", title: "Lead", x: 690, y: 190 },
+    out: { id: "out", title: "Sent", x: 1000, y: 190 },
   },
 };
 const NARROW: Layout = {
@@ -127,7 +127,7 @@ const SERVICE: Record<Phase, Record<Station, number>> = {
   after: { a: 0.6, agent: 0.15, b: 0.3 },
 };
 const PHASE_LENGTH: Record<Phase, number> = { before: 16, after: 14 };
-const SPEED = 110; // pixels a second along a wire
+const SPEED = 150; // pixels a second along a wire
 const QUEUE_MAX = 24;
 
 type Moving = { id: number; from: Id; to: Id; t: number; len: number };
@@ -254,11 +254,14 @@ function NodeView({ L, n, s }: { L: Layout; n: Node; s: Sim }) {
   const queue = station ? s.queue[station].slice(0, QUEUE_MAX) : [];
   const off = (n.id === "a" && after) || (n.id === "agent" && !after);
   // The agent node drops in from a little above when it joins.
+  // On the very first round there is nothing to fade out, so the room starts empty.
   const join =
     n.id === "agent"
       ? after
         ? Math.min(1, s.clock / 0.7)
-        : Math.max(0, 1 - s.clock / 0.5)
+        : s.time > s.clock
+          ? Math.max(0, 1 - s.clock / 0.5)
+          : 0
       : 1;
   const lift = n.id === "agent" ? (1 - join) * -14 : 0;
   const icon = { x: n.x + L.nodeW / 2, y: n.y + HEAD + 32 };
@@ -292,7 +295,7 @@ function NodeView({ L, n, s }: { L: Layout; n: Node; s: Sim }) {
         y2={n.y + HEAD}
         className="ow-rule"
       />
-      <text x={n.x + 10} y={n.y + 18} className="ow-title">
+      <text x={n.x + 10} y={n.y + 17} className="ow-title">
         {n.title}
       </text>
       <circle
@@ -482,7 +485,7 @@ const DESCRIPTION =
 
 export function OfficeWorld({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
-  const narrow = useMediaQuery("(max-width: 40rem)");
+  const narrow = useMediaQuery("(max-width: 63.99rem)");
   const L = narrow ? NARROW : WIDE;
 
   const sim = useRef<Sim>(fresh());
@@ -520,7 +523,13 @@ export function OfficeWorld({ className }: { className?: string }) {
 
   if (reduced) {
     return (
-      <figure className={cx("grid gap-8", className)}>
+      <figure
+        className={cx(
+          "grid gap-8",
+          narrow && "mx-auto w-full max-w-[26rem]",
+          className,
+        )}
+      >
         <figcaption className="sr-only">{DESCRIPTION}</figcaption>
         <Scene L={L} s={still("before")} />
         <Scene L={L} s={still("after")} />
@@ -528,7 +537,10 @@ export function OfficeWorld({ className }: { className?: string }) {
     );
   }
   return (
-    <figure ref={box} className={className}>
+    <figure
+      ref={box}
+      className={cx(narrow && "mx-auto w-full max-w-[26rem]", className)}
+    >
       <figcaption className="sr-only">{DESCRIPTION}</figcaption>
       <Scene L={L} s={sim.current} />
     </figure>
