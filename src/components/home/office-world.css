@@ -1,6 +1,7 @@
 /*
   The flow canvas: a grid, nodes with a title bar and ports, and curved wires. Every shade is the page's ink
-  mixed into the page colour, so light and dark both work; the one colour is --flow, for the work.
+  mixed into the page colour, so light and dark both work. Two colours only: --flow for information on the move,
+  --ok for a flow that runs at a steady pace.
 */
 .ow * {
   vector-effect: non-scaling-stroke;
@@ -42,7 +43,7 @@
   stroke-dasharray: 2 10;
   opacity: 0;
   transition: opacity 300ms ease;
-  animation: ow-march 0.9s linear infinite;
+  animation: ow-march 0.5s linear infinite;
 }
 .ow .ow-wire-live .ow-wire-flow {
   opacity: 1;
@@ -110,9 +111,63 @@
   stroke-linecap: round;
 }
 
-/* The work */
+/* Paced: what the agent passes on, and the nodes that run at a steady pace. */
+.ow .ow-wire-paced .ow-wire-flow {
+  stroke: var(--ok);
+}
+.ow .ow-ok .ow-box {
+  stroke: var(--ok);
+  stroke-width: 2;
+}
+.ow .ow-ok .ow-status {
+  fill: var(--ok);
+}
+.ow .ow-settle {
+  fill: none;
+  stroke: var(--ok);
+  stroke-width: 1.5;
+}
+
+/* Who is in a node: a crossfade between the two phases. */
+.ow .ow-swap {
+  transition: opacity 500ms ease;
+}
+.ow .ow-hide {
+  opacity: 0;
+}
+.ow .ow-fold {
+  transition: opacity 700ms ease;
+}
+.ow .ow-gone {
+  opacity: 0;
+}
+.ow .ow-arm {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.ow .ow-thin {
+  stroke-width: 3.5;
+}
+.ow .ow-thumb {
+  stroke-width: 3;
+}
+.ow .ow-z {
+  fill: var(--fg-muted);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* Information */
 .ow .ow-item {
   fill: var(--flow);
+}
+.ow .ow-item .ow-paced {
+  fill: var(--ok);
+}
+.ow .ow-glow {
+  opacity: 0.55;
 }
 
 @media (prefers-reduced-motion: reduce) {
