@@ -12,6 +12,7 @@
   --color-error: var(--error);
   --color-accent: var(--accent);
   --color-accent-fg: var(--accent-fg);
+  --color-flow: var(--flow);
   --color-glass: var(--glass);
   --color-glass-edge: var(--glass-edge);
 

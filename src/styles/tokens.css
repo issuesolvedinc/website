@@ -63,6 +63,7 @@
   --error: var(--red-on-paper);
   --accent: var(--orange);
   --accent-fg: var(--orange-text);
+  --flow: #1f55e6; /* work moving through a flow diagram, and nothing else */
   --glass: color-mix(in srgb, var(--paper) 72%, transparent);
   --glass-edge: color-mix(in srgb, var(--ink) 14%, transparent);
   color-scheme: light;
@@ -78,6 +79,7 @@
     --error: var(--red-on-night);
     --accent: var(--orange);
     --accent-fg: var(--orange);
+    --flow: #6b95ff;
     --glass: color-mix(in srgb, var(--night) 68%, transparent);
     --glass-edge: color-mix(in srgb, var(--chalk) 16%, transparent);
     color-scheme: dark;
@@ -93,6 +95,7 @@
   --error: var(--red-on-night);
   --accent: var(--orange);
   --accent-fg: var(--orange);
+  --flow: #6b95ff;
   --glass: color-mix(in srgb, var(--night) 68%, transparent);
   --glass-edge: color-mix(in srgb, var(--chalk) 16%, transparent);
   color-scheme: dark;

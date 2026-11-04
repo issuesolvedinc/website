@@ -1,8 +1,8 @@
 import { Label, TextLink, Wordmark } from "@/components";
-import { BottleneckFlow } from "@/components/home/bottleneck-flow";
 import { FlowPanel, InlineFlow } from "@/components/home/flow-panel";
+import { OfficeWorld } from "@/components/home/office-world";
 import { HEADLINE } from "@/content/headline";
-import { officeChange, showcaseFlows } from "@/content/example-flows";
+import { showcaseFlows } from "@/content/example-flows";
 import {
   stepLabel,
   orderSteps,
@@ -11,7 +11,8 @@ import {
 
 // The headline is the only line on the site that says what IssueSolved does (identity note, change of 2026-11-05).
 // Everything else from the change of 2026-11-04 holds: no services list, no offerings, no promises. Under the
-// headline, one small office flow shows a bottleneck clearing once an agent takes part of the work.
+// headline, a small office in black and white plays on its own: work (in blue) piles up at one person,
+// then an agent joins and the pile goes down. Nothing to click.
 // The example flows follow in direction B: a running flow beside the page follows the reader.
 
 const EMAIL = "contact@issuesolved.ca";
@@ -40,7 +41,7 @@ export default function Home() {
           {HEADLINE}
         </h1>
         <div className="mt-10 md:mt-14">
-          <BottleneckFlow change={officeChange} bottleneck="review" />
+          <OfficeWorld className="max-w-[60rem]" />
         </div>
       </section>
 

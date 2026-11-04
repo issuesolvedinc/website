@@ -1,4 +1,4 @@
-import { FLOW_DEFINITION_VERSION, type FlowChange, type FlowDefinition } from "@/lib/flow/definition";
+import { FLOW_DEFINITION_VERSION, type FlowDefinition } from "@/lib/flow/definition";
 
 /*
   Example flows for the site and the design system: AI agents and team members working on generic engineering firm work.
@@ -97,52 +97,3 @@ export const meetingFlow: FlowDefinition = {
 /** The flows on the home page, in order. */
 export const showcaseFlows = [drawingReviewFlow, rfiFlow, inspectionFlow, meetingFlow];
 
-/*
-  The home page picture: generic office work, before and after an agent takes part of it.
-  Both sides share node ids so the diagram turns one into the other in place. The queue is the picture of a
-  bottleneck, not a measurement, and the page shows no result figures.
-*/
-const officeBefore: FlowDefinition = {
-  version: FLOW_DEFINITION_VERSION,
-  id: "office-before",
-  title: "Office requests, before",
-  example: true,
-  nodes: [
-    { id: "in", kind: "input", title: "Requests come in", detail: "Email, forms, calls" },
-    { id: "sort", kind: "person", role: "Coordinator", title: "Sorts them by hand", detail: "One by one" },
-    { id: "review", kind: "person", role: "Lead", title: "Reviews and writes every reply", detail: "Everything waits here", queue: 9 },
-    { id: "out", kind: "output", title: "Replies go out", detail: "When the lead gets to them" },
-  ],
-  edges: [
-    { id: "e1", from: "in", to: "sort", pace: "busy" },
-    { id: "e2", from: "sort", to: "review", pace: "steady" },
-    { id: "e3", from: "review", to: "out", pace: "slow" },
-  ],
-};
-
-const officeAfter: FlowDefinition = {
-  version: FLOW_DEFINITION_VERSION,
-  id: "office-after",
-  title: "Office requests, with an agent",
-  example: true,
-  nodes: [
-    { id: "in", kind: "input", title: "Requests come in", detail: "Email, forms, calls" },
-    { id: "sort", kind: "agent", title: "Sorts and drafts the reply", detail: "Each request, as it arrives" },
-    { id: "review", kind: "approval", role: "Lead", title: "Approves the draft", detail: "Or fixes it and sends it on" },
-    { id: "out", kind: "output", title: "Replies go out", detail: "As they are approved" },
-  ],
-  edges: [
-    { id: "e1", from: "in", to: "sort", pace: "busy" },
-    { id: "e2", from: "sort", to: "review", pace: "busy" },
-    { id: "e3", from: "review", to: "out", pace: "busy" },
-  ],
-};
-
-export const officeChange: FlowChange = {
-  id: "office-requests",
-  title: "Office requests",
-  example: true,
-  before: officeBefore,
-  after: officeAfter,
-  labels: { before: "Before", after: "With an agent" },
-};
