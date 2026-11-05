@@ -20,13 +20,13 @@ These rules apply to every word: page copy, flows, documents, code comments, com
 
 leverage, seamless, cutting edge, unlock, empower, revolutionize, revolutionise, robust, synergy, state of the art, game changing.
 
-The list in `scripts/check-voice.mjs` is the source of truth. Run the check before every commit:
+In the website repo the list in `scripts/check-voice.mjs` is the source of truth, and the check runs before every commit:
 
 ```bash
 npm run check:voice
 ```
 
-It scans `src/` and `DESIGN.md`. It does not scan `docs/`, which is why the list can be written here.
+It scans the code and `DESIGN.md`, not this guide, which is why the list can be written here. Any repo that holds brand text should run the same check.
 
 ## Plain way to say it
 

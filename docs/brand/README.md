@@ -2,7 +2,7 @@
 
 The one place to design from. Written for people and for agents: every rule is stated plainly, every value is exact, and anything not yet approved by the founder is tagged **(proposed)**.
 
-Last updated 2026-11-05. It lives in the website repo for now. It moves to the unified codebase once the founder decides where that is.
+Last updated 2026-11-05. It lives in the website repo for now and moves to `issuesolvedinc/ai-workflows` as the brand package, which the website will then import. Links inside the guide are relative and the tokens are plain CSS, so the move is a copy of this folder.
 
 ## Read in this order
 
@@ -11,7 +11,8 @@ Last updated 2026-11-05. It lives in the website repo for now. It moves to the u
 | [logo.md](logo.md) | The mark, the wordmark, the lockup, clear space, minimum size, colour versions, what not to do |
 | [colour.md](colour.md) | The brand colours, the site tokens, contrast ratios |
 | [type.md](type.md) | Faces, weights, the type scale, the headline style |
-| [tokens.md](tokens.md) | Spacing, layout, corners, glass, focus, where the code lives |
+| [tokens.md](tokens.md) | Spacing, layout, corners, glass, focus |
+| [tokens.css](tokens.css) | Every token as plain CSS, light and dark |
 | [flow-and-motion.md](flow-and-motion.md) | The flow grammar in short, the motion rules |
 | [voice.md](voice.md) | How IssueSolved writes, the banned words, what never to claim |
 | [print.md](print.md) | The business card and how to print it |
@@ -33,9 +34,7 @@ Files: everything is in [assets/](assets/).
 
 ## Sources
 
-- Tokens in code: `src/styles/tokens.css`, mapped in `src/app/globals.css`.
-- The mark in code: `src/components/mark.tsx`, the favicon `src/app/icon.svg`.
-- The wordmark in code: `src/components/wordmark.tsx` and the `.wordmark` rules in `src/app/globals.css`.
 - The flow engine and its full grammar: the `dynamic-process-flow` skill.
-- The voice check: `npm run check:voice` (`scripts/check-voice.mjs`).
 - Identity and voice decisions: the Core Identity note in the vault. When this guide and that note disagree, the note wins, and this guide is updated.
+
+In the website repo, until it imports this package: tokens in `src/styles/tokens.css` (mapped in `src/app/globals.css`), the mark in `src/components/mark.tsx`, the favicon in `src/app/icon.svg`, the wordmark in `src/components/wordmark.tsx`, the voice check in `scripts/check-voice.mjs` (`npm run check:voice`).

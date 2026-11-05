@@ -1,6 +1,8 @@
 # Tokens and layout
 
-All tokens live in `src/styles/tokens.css`. Tailwind 4 maps them in `src/app/globals.css` (`@theme inline`), so `bg-bg`, `text-fg`, `text-fg-muted`, `border-rule`, `bg-fill`, `text-accent-fg`, `text-flow`, `text-ok` and `bg-glass` follow the theme with no `dark:` classes. Colour tokens are in [colour.md](colour.md).
+The tokens are in [tokens.css](tokens.css): plain CSS custom properties, no framework, no build step. Link it, or copy it, and use the semantic tokens (`--bg`, `--fg`, `--accent`, `--mark-high`, ...). Light is the default; dark follows the system setting, and `data-theme="light"` or `"dark"` forces one on any element. Brand palette tokens carry an `--is-` prefix. Colour meanings are in [colour.md](colour.md).
+
+In the website repo the same values live in `src/styles/tokens.css`, and Tailwind 4 maps them in `src/app/globals.css`. Keep the two files in step until the website imports this one.
 
 ## Spacing
 
@@ -40,4 +42,4 @@ Frosted surfaces sit over an effect or a flow, never over plain paper: `--glass`
 
 ## Components
 
-The current set is in `src/components/` and the specimen at `/design-system` (not linked, `noindex`). `DESIGN.md` lists them. New components use DM Sans, the tokens above, and the flow grammar where they show work.
+In the website repo the current set is in `src/components/`, listed in its `DESIGN.md`, with a specimen at `/design-system`. New components use DM Sans, the tokens above, and the flow grammar where they show work.

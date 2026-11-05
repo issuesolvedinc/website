@@ -44,7 +44,7 @@ In the one colour versions the cut is a real gap, not white, so they work on any
 - "Issue" in the text colour, inside a rounded, dashed orange outline (work waiting).
 - "Solved" in italic, on a square cornered emerald block (work done). White text on light grounds, ink `#141414` on the bright emerald in dark.
 
-In code it is live text (`src/components/wordmark.tsx`), sized with a text class. Border 0.09em, padding 0.14em 0.3em 0.18em, Issue corner radius 0.32em, gap 0.1em.
+It is live text, sized with the font size of its context (in the website: `src/components/wordmark.tsx`). Border 0.09em, padding 0.14em 0.3em 0.18em, Issue corner radius 0.32em, gap 0.1em.
 
 ## The lockup
 
@@ -86,5 +86,5 @@ On a flow delivered to a client in their own theme, the mark is the signature. I
 - Stretch, skew, rotate or flip it.
 - Move the dot, resize it, or replace it with another symbol.
 - Put it on a busy photo without the one colour white version.
-- Use the retired logos (the old blue and orange logo, the typewriter wordmark in `public/brand/`).
+- Use the retired logos (the old blue and orange logo, the typewriter wordmark).
 - Tie the orange dot to any other company's brand. It is our orange.

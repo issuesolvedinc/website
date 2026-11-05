@@ -1,0 +1,162 @@
+/*
+  IssueSolved brand tokens. Plain CSS custom properties, no build step, no framework.
+  Light by default. Dark follows the system setting, and data-theme="light" or data-theme="dark"
+  on any element forces a theme for that element and its children.
+  The semantic tokens (--bg, --fg, ...) are what components use. The palette is for reference.
+  Source: docs/brand/colour.md, type.md, tokens.md. Kept in step with the website's src/styles/tokens.css.
+*/
+
+:root {
+  /* Brand palette */
+  --is-navy: #0a1f44;
+  --is-navy-dark: #2a4a8f; /* the mark's upper triangle on dark grounds; shapes only, never text */
+  --is-navy-text-dark: #7d9be0; /* navy words on dark grounds, 6.70:1 on night */
+  --is-emerald: #0f7b5f; /* 5.23:1 on white */
+  --is-emerald-dark: #2fc79b; /* 8.57:1 on night */
+  --is-orange: #ff9a00; /* shapes only on light grounds (2.13:1 on white) */
+  --is-orange-text: #9a5300; /* orange words on light grounds, 5.34:1 on paper */
+  --is-white: #ffffff;
+
+  /* Neutral palette */
+  --is-ink: #141414;
+  --is-paper: #f7f5f0;
+  --is-chalk: #f2efe8;
+  --is-gray-700: #5c5852;
+  --is-gray-300: #b3ada2;
+  --is-gray-100: #ece8e0;
+  --is-gray-700-dark: #a8a39a;
+  --is-gray-300-dark: #4a4843;
+  --is-gray-100-dark: #242422;
+  --is-red: #8c2f1f; /* errors only */
+  --is-red-dark: #e08a78;
+
+  /* Flow state colours */
+  --is-flow: #1f55e6; /* work moving */
+  --is-flow-dark: #6b95ff;
+  --is-ok: #168a4a; /* connected, steady, done inside a flow */
+  --is-ok-dark: #3fcf7e;
+  --is-rework: #e79c00; /* rework and warnings */
+  --is-heat: #e5484d; /* overload */
+
+  /* Type */
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --weight-light: 300;
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --tracking-tight: -0.02em;
+
+  --text-xs: 0.8125rem; /* 13px, line height 1.4 */
+  --text-sm: 0.9375rem; /* 15px, 1.5 */
+  --text-base: 1.125rem; /* 18px, 1.6 */
+  --text-lg: 1.375rem; /* 22px, 1.45 */
+  --text-xl: 1.75rem; /* 28px, 1.3 */
+  --text-2xl: 2.25rem; /* 36px, 1.2 */
+  --text-3xl: 3rem; /* 48px, 1.1 */
+
+  /* Spacing, a 4px base */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --page-max: 68rem;
+  --measure: 38rem;
+  --label-col: 11rem;
+  --gutter: 1rem;
+  --rule-width: 1px;
+  --rule-width-strong: 2px;
+
+  /* Corners: square by default, set on purpose */
+  --radius-card: 10px; /* flow cards and pills */
+  --radius-issue: 0.32em; /* the Issue outline in the wordmark */
+
+  /* Motion */
+  --duration: 150ms; /* colour and underline changes only */
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --gutter: 3rem;
+  }
+}
+
+/* Semantic tokens, light */
+:root,
+[data-theme="light"] {
+  --bg: var(--is-paper);
+  --fg: var(--is-ink);
+  --fg-muted: var(--is-gray-700);
+  --rule: var(--is-gray-300);
+  --fill: var(--is-gray-100);
+  --error: var(--is-red);
+  --accent: var(--is-orange);
+  --accent-fg: var(--is-orange-text);
+  --flow: var(--is-flow);
+  --ok: var(--is-ok);
+  --brand-navy: var(--is-navy);
+  --brand-green: var(--is-emerald);
+  --brand-on-green: var(--is-white);
+  --mark-high: var(--is-navy);
+  --mark-low: var(--is-emerald);
+  --glass: color-mix(in srgb, var(--is-paper) 72%, transparent);
+  --glass-edge: color-mix(in srgb, var(--is-ink) 14%, transparent);
+  color-scheme: light;
+}
+
+/* Semantic tokens, dark: once for the system setting, once for a forced theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--is-ink);
+    --fg: var(--is-chalk);
+    --fg-muted: var(--is-gray-700-dark);
+    --rule: var(--is-gray-300-dark);
+    --fill: var(--is-gray-100-dark);
+    --error: var(--is-red-dark);
+    --accent: var(--is-orange);
+    --accent-fg: var(--is-orange);
+    --flow: var(--is-flow-dark);
+    --ok: var(--is-ok-dark);
+    --brand-navy: var(--is-navy-text-dark);
+    --brand-green: var(--is-emerald-dark);
+    --brand-on-green: var(--is-ink);
+    --mark-high: var(--is-navy-dark);
+    --mark-low: var(--is-emerald-dark);
+    --glass: color-mix(in srgb, var(--is-ink) 68%, transparent);
+    --glass-edge: color-mix(in srgb, var(--is-chalk) 16%, transparent);
+    color-scheme: dark;
+  }
+}
+
+[data-theme="dark"] {
+  --bg: var(--is-ink);
+  --fg: var(--is-chalk);
+  --fg-muted: var(--is-gray-700-dark);
+  --rule: var(--is-gray-300-dark);
+  --fill: var(--is-gray-100-dark);
+  --error: var(--is-red-dark);
+  --accent: var(--is-orange);
+  --accent-fg: var(--is-orange);
+  --flow: var(--is-flow-dark);
+  --ok: var(--is-ok-dark);
+  --brand-navy: var(--is-navy-text-dark);
+  --brand-green: var(--is-emerald-dark);
+  --brand-on-green: var(--is-ink);
+  --mark-high: var(--is-navy-dark);
+  --mark-low: var(--is-emerald-dark);
+  --glass: color-mix(in srgb, var(--is-ink) 68%, transparent);
+  --glass-edge: color-mix(in srgb, var(--is-chalk) 16%, transparent);
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration: 0ms;
+  }
+}

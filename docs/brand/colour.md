@@ -14,7 +14,7 @@ Two sets: the brand colours (the mark, the wordmark, the headline words, print) 
 
 ## Site tokens
 
-Set in `src/styles/tokens.css`. Themes follow the system, and `data-theme="light"` or `"dark"` forces one on any element.
+Set in [tokens.css](tokens.css). Themes follow the system, and `data-theme="light"` or `"dark"` forces one on any element.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
