@@ -2,6 +2,7 @@ export { Button } from "./button";
 export { Container } from "./container";
 export { Heading } from "./heading";
 export { Label } from "./label";
+export { Mark } from "./mark";
 export { Note } from "./note";
 export { NumberedList } from "./numbered-list";
 export { ProcessFlow, type FlowStep } from "./process-flow";

@@ -79,7 +79,11 @@ export function TypedHeadline({ className }: { className?: string }) {
       const tail = word.slice(bare.length);
       return (
         <Fragment key={w}>
-          {HEADLINE_BOLD.includes(bare) ? <strong className="font-semibold">{letters(bare)}</strong> : letters(bare)}
+          {HEADLINE_BOLD.includes(bare) ? (
+            <strong className={`font-semibold hl-${bare.toLowerCase()}`}>{letters(bare)}</strong>
+          ) : (
+            letters(bare)
+          )}
           {tail && letters(tail)}
           {w < words.length - 1 && letters(" ")}
         </Fragment>

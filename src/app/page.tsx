@@ -1,4 +1,4 @@
-import { Wordmark } from "@/components";
+import { Mark, Wordmark } from "@/components";
 import { ContactReveal } from "@/components/home/contact-reveal";
 import { MainFlow } from "@/components/home/main-flow";
 import { ServiceRows } from "@/components/home/service-rows";
@@ -19,7 +19,10 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <div className={wrap}>
         <header className="flex items-center justify-between pt-6">
-          <Wordmark className="text-base" />
+          <span className="flex items-center gap-2">
+            <Mark className="text-[1.75rem]" />
+            <Wordmark className="text-base" />
+          </span>
           <ThemeToggle />
         </header>
       </div>

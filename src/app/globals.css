@@ -125,7 +125,7 @@
   }
 
   /* The wordmark: two outlined nodes, no fills, both words in the text colour. "Issue" waits in a rounded, dashed
-     orange outline; "Solved", in italic, sits in a square cornered green outline (the map's done green). */
+     orange outline; "Solved", in italic, sits on a square cornered block of the logo green. */
   .wordmark {
     gap: 0.1em;
   }
@@ -140,9 +140,62 @@
     border-radius: 0.32em;
   }
   .wordmark-solved {
-    border-color: var(--ok);
+    border-color: var(--brand-green);
     border-radius: 0;
+    background: var(--brand-green);
+    color: var(--brand-on-green);
     font-style: italic;
+  }
+
+  /* The logo colours, for the wordmark and the headline words. Dark uses the mark's brighter pair, and a lighter
+     navy for text so it stays readable on night. */
+  :root {
+    --brand-green: #0f7b5f;
+    --brand-on-green: #ffffff;
+    --brand-navy: #0a1f44;
+  }
+  [data-theme="dark"] {
+    --brand-green: #2fc79b;
+    --brand-on-green: #141414;
+    --brand-navy: #7d9be0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --brand-green: #2fc79b;
+      --brand-on-green: #141414;
+      --brand-navy: #7d9be0;
+    }
+  }
+  .hl-transform {
+    color: var(--orange);
+  }
+  .hl-business {
+    color: var(--brand-navy);
+  }
+  .hl-reclaim {
+    color: var(--brand-green);
+  }
+
+  /* The mark: emerald and navy on light, their brighter pair on dark. */
+  .mark .mark-low {
+    fill: #0f7b5f;
+  }
+  .mark .mark-high {
+    fill: #0a1f44;
+  }
+  [data-theme="dark"] .mark .mark-low {
+    fill: #2fc79b;
+  }
+  [data-theme="dark"] .mark .mark-high {
+    fill: #2a4a8f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .mark .mark-low {
+      fill: #2fc79b;
+    }
+    :root:not([data-theme="light"]) .mark .mark-high {
+      fill: #2a4a8f;
+    }
   }
 
   /* The theme toggle shows the sun in dark (to go light) and the moon in light (to go dark). */
