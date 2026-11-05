@@ -45,7 +45,7 @@ export function ContactReveal() {
         onClick={() => setState(state === "closed" ? "open" : state === "sent" ? "sent" : "closed")}
       >
         <Check />
-        Contact
+        Contact us
       </Button>
       {state !== "closed" && <ContactForm state={state} setState={setState} />}
     </div>

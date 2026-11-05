@@ -179,7 +179,7 @@ const NODES: Node[] = [
     id: "crm",
     x: 805,
     y: 168,
-    title: "CRM",
+    title: "Clients",
     tool: "crm",
     kind: "system",
     isolated: true,
@@ -198,7 +198,7 @@ const NODES: Node[] = [
     id: "orchestrate",
     x: 190,
     y: 400,
-    title: "Orchestrate",
+    title: "Sort and route",
     tool: "agent",
     kind: "agent",
   },
@@ -1233,10 +1233,10 @@ function Scene({ s }: { s: Sim }) {
         className="pw-frame"
       />
       <text x={24} y={46} className="pw-lane">
-        Now
+        Today
       </text>
       <text x={24} y={H - 30} className="pw-lane">
-        IssueSolved
+        With IssueSolved
       </text>
 
       {WIRES.map((w, i) => {
@@ -1406,7 +1406,7 @@ function Scene({ s }: { s: Sim }) {
 }
 
 const DESCRIPTION =
-  "Now and with IssueSolved, the same work from the same inputs. Now: email, contracts, requests and calls pour in fast, unread mail climbs past 1700, and work piles up in one backlog, things fall off, the rest crawls on, records wait to be typed in again between systems that are not connected, unpaid invoices climb past 1700 while nobody works them, the CRM sits idle, and the calls land on a team that is out of time; it all ends on a clock that keeps running. With IssueSolved: an agent orchestrates the work and passes it along one straight line of people and agents, each checking it in turn at one steady pace, into connected systems, and a happy team finishes on a check.";
+  "Today work piles up across inboxes and systems; with IssueSolved it moves along one line, checked at each step, and your team gets time back.";
 
 export function MainFlow({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();

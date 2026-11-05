@@ -31,6 +31,9 @@ export default function Home() {
         <section className={`${wrap} flex flex-col gap-10 py-12 md:gap-12 md:py-16`}>
           <TypedHeadline className="text-lg font-light tracking-[-0.02em] md:text-xl" />
           <MainFlow />
+          <a href="#contact" className="self-center text-sm text-fg-muted underline-offset-4 hover:text-fg hover:underline">
+            Get started
+          </a>
         </section>
 
         <div className="border-y border-rule bg-fill">
@@ -39,7 +42,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`${wrap} flex justify-center py-14 md:py-20`}>
+        <div id="contact" className={`${wrap} flex scroll-mt-8 justify-center py-14 md:py-20`}>
           <ContactReveal />
         </div>
       </main>

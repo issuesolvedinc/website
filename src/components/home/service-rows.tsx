@@ -99,8 +99,8 @@ export function ServiceRows() {
           <li className="sr-box">
             <div className="sr-fork">
               <Node icon="cloud" tone={{ c: "#0ea5e9" }}>Cloud</Node>
-              <span className="sr-and">and</span>
-              <Node icon="server" tone={{ c: "#0d9488" }}>On premise</Node>
+              <span className="sr-and">or</span>
+              <Node icon="server" tone={{ c: "#0d9488" }}>Your servers</Node>
               <div className="sr-merge" aria-hidden="true">
                 <i className="sr-arm sr-l" />
                 <i className="sr-arm sr-r" />
@@ -112,7 +112,7 @@ export function ServiceRows() {
                 <i className="sr-dot sr-mr" style={{ "--dc": "#0d9488", "--d": "1.6s" } as React.CSSProperties} />
               </div>
               <div className="sr-last">
-                <Node icon="parcel" tone={{ c: "#1f9d55" }}>Deployment</Node>
+                <Node icon="parcel" tone={{ c: "#1f9d55" }}>Set up</Node>
               </div>
             </div>
           </li>
@@ -135,7 +135,7 @@ export function ServiceRows() {
             <Wire dir="across" dot="#e54666" delay={0} />
           </li>
           <li className="sr-step">
-            <Node icon="look" tone={{ c: "#0091ff" }} n={2}>Assess your environment</Node>
+            <Node icon="look" tone={{ c: "#0091ff" }} n={2}>Review how you work today</Node>
             <Wire dir="across" dot="#0091ff" delay={0.8} />
           </li>
           <li className="sr-step">
