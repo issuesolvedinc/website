@@ -7,7 +7,7 @@ type ButtonProps =
   | ({ href?: undefined; variant?: Variant } & React.ButtonHTMLAttributes<HTMLButtonElement>);
 
 const base =
-  "inline-flex min-h-11 items-center justify-center border border-fg px-5 py-2 font-mono text-sm uppercase tracking-[0.06em] transition-colors duration-[var(--duration)] disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex min-h-11 items-center justify-center border border-fg px-5 py-2 font-sans text-sm font-medium transition-colors duration-[var(--duration)] disabled:cursor-not-allowed disabled:opacity-50";
 
 const variants: Record<Variant, string> = {
   primary: "bg-fg text-bg hover:bg-bg hover:text-fg",

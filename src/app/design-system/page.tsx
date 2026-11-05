@@ -115,7 +115,7 @@ export default function DesignSystem() {
       <header>
         <Container className="pb-12 pt-12 md:pb-16 md:pt-16">
           <TextLink href="/" className="inline-block">
-            <Wordmark className="w-40" decorative />
+            <Wordmark className="text-xl" decorative />
             <span className="sr-only">IssueSolved home</span>
           </TextLink>
           <Heading level={1} className="mt-10">
@@ -131,19 +131,18 @@ export default function DesignSystem() {
       <main>
         <Section id="wordmark" number="00" title="Wordmark">
           <Text>
-            Set in Courier Prime Bold and outlined, so it never depends on a font loading. Black and white only. It
-            takes the current text color.
+            Set in DM Sans SemiBold, the site's sans. Black and white only. It takes the current text color.
           </Text>
           <div className="grid gap-4 md:grid-cols-2">
             {themes.map((t) => (
               <Panel key={t} theme={t}>
-                <Wordmark className="w-full max-w-72" />
+                <Wordmark className="text-3xl" />
               </Panel>
             ))}
           </div>
           <div className="flex flex-wrap items-end gap-8">
-            <Wordmark className="w-24" decorative />
-            <Wordmark className="w-40" decorative />
+            <Wordmark className="text-base" decorative />
+            <Wordmark className="text-xl" decorative />
             <div className="flex items-end gap-3">
               <img src="/icon.svg" alt="Favicon" width={32} height={32} />
               <Label>Favicon</Label>

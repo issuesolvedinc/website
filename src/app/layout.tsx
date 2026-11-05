@@ -1,7 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Courier_Prime, Source_Serif_4 } from "next/font/google";
+import { DM_Mono, DM_Sans, Source_Serif_4 } from "next/font/google";
 import { HEADLINE } from "@/content/headline";
 import "./globals.css";
+
+// A plain, friendly sans, close in feel to the type on anthropic.com (whose own faces are not licensed for
+// other sites). It sets the wordmark, the headline, the buttons and the map.
+const sans = DM_Sans({
+  subsets: ["latin"],
+  axes: ["opsz"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
 
 const serif = Source_Serif_4({
   subsets: ["latin"],
@@ -10,10 +19,10 @@ const serif = Source_Serif_4({
   display: "swap",
 });
 
-const mono = Courier_Prime({
+const mono = DM_Mono({
   subsets: ["latin"],
-  weight: ["400", "700"],
-  variable: "--font-courier-prime",
+  weight: ["400", "500"],
+  variable: "--font-dm-mono",
   display: "swap",
 });
 
@@ -32,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-CA" className={`${serif.variable} ${mono.variable}`}>
+    <html lang="en-CA" className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );

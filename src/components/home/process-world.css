@@ -1,0 +1,327 @@
+/*
+  The live process canvas. Cards, wires and the grid take the page's ink and paper, so light and dark both work;
+  colour belongs to the tools (their icons) and to the work moving between them. Green is the steady pace after.
+*/
+.pw {
+  --pw-edge: color-mix(in srgb, var(--fg) 16%, transparent);
+  --pw-muted: color-mix(in srgb, var(--fg) 45%, var(--bg));
+  --pw-card: color-mix(in srgb, var(--bg) 45%, white);
+  /* The check symbol. Green by default; the main map wears the brand orange. */
+  --pw-check: var(--ok);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pw {
+    --pw-card: color-mix(in srgb, var(--bg) 90%, white);
+  }
+}
+[data-theme="dark"] .pw {
+  --pw-card: color-mix(in srgb, var(--bg) 90%, white);
+}
+.pw path,
+.pw line,
+.pw rect,
+.pw circle {
+  vector-effect: non-scaling-stroke;
+}
+.pw .pw-canvas {
+  fill: color-mix(in srgb, var(--fg) 2.5%, var(--bg));
+}
+.pw .pw-grid-dot {
+  fill: color-mix(in srgb, var(--fg) 16%, transparent);
+}
+.pw .pw-frame {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 18%, transparent);
+}
+
+/* Wires: straight and oblique. A quiet line, a heavier glow while work is on it, and the work marching. */
+.pw .pw-wire {
+  transition: opacity 600ms ease;
+}
+.pw .pw-wire path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.pw .pw-wire-base {
+  stroke: color-mix(in srgb, var(--fg) 32%, transparent);
+  stroke-width: 1.5;
+}
+.pw .pw-wire-back .pw-wire-base {
+  stroke-dasharray: 5 4;
+  stroke: color-mix(in srgb, #e79c00 65%, transparent);
+}
+.pw .pw-wire-load {
+  transition: stroke-width 200ms ease;
+}
+.pw .pw-wire-flow {
+  stroke-width: 1.5;
+  stroke-dasharray: 2 9;
+  animation: pw-march 0.45s linear infinite;
+  opacity: 0.8;
+}
+.pw .pw-wire-off {
+  opacity: 0.07;
+}
+@keyframes pw-march {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+/* Cards */
+.pw .pw-node {
+  transition: opacity 500ms ease;
+}
+.pw .pw-gone {
+  opacity: 0;
+}
+.pw .pw-card {
+  fill: var(--pw-card);
+  stroke: var(--pw-edge);
+  stroke-width: 1.25;
+}
+.pw .pw-head {
+  fill: color-mix(in srgb, var(--fg) 3%, transparent);
+}
+.pw .pw-heat {
+  filter: blur(7px);
+}
+.pw .pw-title {
+  fill: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+.pw .pw-count {
+  fill: #fff;
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  text-anchor: middle;
+}
+.pw .pw-port {
+  fill: var(--bg);
+  stroke: var(--fg);
+  stroke-width: 1.5;
+}
+.pw .pw-track {
+  fill: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
+/* Icons */
+.pw .pw-glyph {
+  color: #fff;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pw .pw-glyph-ink {
+  color: var(--bg);
+}
+.pw .pw-glyph-dark {
+  color: var(--fg-muted);
+}
+.pw .pw-glyph .pw-fill {
+  fill: currentColor;
+  stroke: none;
+}
+.pw .pw-ink {
+  fill: var(--fg);
+}
+.pw .pw-limb {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.pw .pw-thin {
+  stroke-width: 3.5;
+}
+.pw .pw-thumb {
+  stroke-width: 3;
+}
+.pw .pw-z {
+  fill: var(--fg-muted);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+.pw .pw-dots {
+  fill: var(--fg-muted);
+}
+.pw .pw-agent {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.75;
+}
+.pw .pw-orbit {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fg) 14%, transparent);
+  stroke-dasharray: 2 4;
+}
+.pw .pw-settle {
+  fill: none;
+  stroke: var(--ok);
+  stroke-width: 1.5;
+}
+
+/* The work */
+.pw .pw-paper {
+  fill: #fff;
+  stroke-width: 1.3;
+}
+.pw .pw-ink-line {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pw .pw-tick {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pw .pw-back-ring {
+  fill: none;
+  stroke: #e79c00;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2.5;
+}
+.pw .pw-timer {
+  fill: none;
+  stroke: var(--fg-muted);
+  stroke-width: 1.2;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+.pw .pw-sweep {
+  stroke: var(--ok);
+  stroke-width: 2;
+}
+
+/* The main map: before above, after below. Only its check symbols wear the brand orange. */
+.pw.pw-main {
+  --pw-check: var(--orange);
+}
+.pw .pw-lane {
+  fill: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.pw .pw-face {
+  fill: color-mix(in srgb, var(--ok) 14%, var(--pw-card));
+  stroke: var(--fg);
+  stroke-width: 1.6;
+}
+.pw .pw-smile {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+.pw .pw-clock {
+  fill: var(--pw-card);
+  stroke: var(--fg);
+  stroke-width: 1.4;
+}
+.pw .pw-clock-hand {
+  fill: none;
+  stroke: var(--fg);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+.pw .pw-end-clock {
+  fill: var(--pw-card);
+  stroke: var(--fg);
+  stroke-width: 2;
+}
+.pw .pw-hand-big {
+  stroke-width: 2.4;
+}
+.pw .pw-end-ring {
+  fill: none;
+  stroke: var(--pw-check);
+  stroke-width: 2;
+}
+.pw .pw-tick-big {
+  stroke-width: 3.2;
+}
+.pw .pw-warn-halo {
+  fill: none;
+  stroke: #e79c00;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.pw .pw-wire-slow {
+  animation-duration: 1.8s;
+}
+.pw .pw-wire-mid {
+  animation-duration: 1s;
+}
+.pw .pw-wire-steady {
+  stroke-width: 2;
+  animation-duration: 1s;
+  opacity: 0.9;
+}
+.pw .pw-wire-idle {
+  opacity: 0.45;
+}
+.pw .pw-pipe {
+  stroke: color-mix(in srgb, var(--ok) 35%, transparent);
+  stroke-width: 6;
+}
+.pw .pw-loop {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ok) 45%, transparent);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 5;
+  stroke-linejoin: round;
+}
+.pw .pw-track-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ok) 30%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+.pw .pw-desk {
+  fill: color-mix(in srgb, var(--ok) 7%, transparent);
+  stroke: color-mix(in srgb, var(--ok) 35%, transparent);
+  stroke-dasharray: 3 3;
+}
+.pw .pw-check-ring {
+  fill: none;
+  stroke: var(--ok);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);
+}
+.pw .pw-link {
+  fill: none;
+  stroke: var(--ok);
+  stroke-width: 1.5;
+}
+.pw .pw-idle .pw-card,
+.pw .pw-idle .pw-title {
+  opacity: 0.55;
+}
+.pw .pw-muted-ink {
+  fill: var(--fg-muted);
+  opacity: 0.6;
+}
+.pw .pw-bubble {
+  fill: var(--pw-card);
+  stroke: var(--pw-edge);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pw .pw-wire-flow {
+    animation: none;
+  }
+}

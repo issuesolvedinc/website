@@ -17,8 +17,10 @@
   --color-glass: var(--glass);
   --color-glass-edge: var(--glass-edge);
 
+  --font-sans:
+    var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
-  --font-mono: var(--font-courier-prime), "Courier New", Courier, monospace;
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 
 @theme {
@@ -54,7 +56,7 @@
   body {
     background: var(--bg);
     color: var(--fg);
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-size: var(--text-base);
     line-height: 1.6;
     font-optical-sizing: auto;

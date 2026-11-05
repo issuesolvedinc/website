@@ -2,4 +2,4 @@
   The one line on the site that says what IssueSolved does (identity note, change of 2026-11-05).
   Used as the home page heading, the page title and the meta description.
 */
-export const HEADLINE = "We build process flows that give you back your time and clear bottlenecks, with forward deployed AI.";
+export const HEADLINE = "Transform your business with AI";
