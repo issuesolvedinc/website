@@ -1,0 +1,22 @@
+<!doctype html>
+<!--
+  Netlify finds forms by reading the deployed HTML. The contact form on the home page is drawn in the browser, so
+  this static copy declares it: same name ("waitlist", the form already on Netlify) and the same fields.
+  The page posts its submissions here.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Forms</title>
+  </head>
+  <body>
+    <form name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="hidden" name="form-name" value="waitlist" />
+      <input name="bot-field" />
+      <input name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>
