@@ -1,5 +1,7 @@
 # IssueSolved design system
 
+**Rule 0 comes first:** every page, component, message and line of copy is simple, predictable, clear, action led, client first, and keeps our machinery hidden. It is above every other rule. Read it in [`docs/brand/README.md`](docs/brand/README.md#rule-0-above-every-other-rule), with examples in [`docs/brand/voice.md`](docs/brand/voice.md#rule-0).
+
 The brand guide is in [`docs/brand/`](docs/brand/README.md): the logo and its rules, colour and contrast, type, tokens, flow and motion, voice, and print. Design from it. This file only covers what is specific to this codebase.
 
 The source of truth for identity and voice is the Core Identity note in the vault (`03 Brand/Core Identity (draft).md`). When the guide and the note disagree, the note wins and the guide is updated.

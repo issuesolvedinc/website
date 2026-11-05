@@ -1,5 +1,22 @@
 # IssueSolved brand guide
 
+## Rule 0, above every other rule
+
+Every message, product, screen and communication, with clients and with the team, is:
+
+1. **Simple.** One idea at a time, in plain words.
+2. **Predictable.** The same shape every time.
+3. **Clear.** Understood on the first read, literally.
+4. **Action led.** It ends with the next step: who does what, and when. We direct the conversation.
+5. **Client first.** It starts from what the client needs.
+6. **Machinery hidden.** Never show our tools, agents, models, prompts, repos or how the work is done behind the scenes. The client sees the result and the next step.
+
+When any other rule in this guide conflicts with Rule 0, Rule 0 wins. Before and after examples for each point are in [voice.md](voice.md#rule-0).
+
+Source: section 0 of the Core Identity note in the vault, decided by the founder.
+
+---
+
 The one place to design from. Written for people and for agents: every rule is stated plainly, every value is exact, and anything not yet approved by the founder is tagged **(proposed)**.
 
 Last updated 2026-11-05. It lives in the website repo for now and moves to `issuesolvedinc/ai-workflows` as the brand package, which the website will then import. Links inside the guide are relative and the tokens are plain CSS, so the move is a copy of this folder.
