@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IssueSolved Square Mark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600&display=swap">
+<style>
+/* Layout: one card per version: large on white and ink, then small widths and app tiles. */
+:root{ --bg:#fff; --fg:#141414; --muted:#5f5a54; --line:rgba(20,20,20,.12); --sans:"Hanken Grotesk",ui-sans-serif,system-ui,sans-serif; }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f0f0f; --fg:#f4f3f1; --muted:#a9a49d; --line:rgba(255,255,255,.12); color-scheme:dark;}}
+:root[data-theme="dark"]{--bg:#0f0f0f; --fg:#f4f3f1; --muted:#a9a49d; --line:rgba(255,255,255,.12); color-scheme:dark;}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);line-height:1.55}
+.wrap{max-width:64rem;margin:0 auto;padding:56px 16px 72px;display:grid;gap:24px}
+h1{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.02em;margin:0}
+h2{font-size:18px;font-weight:600;margin:0}
+p{margin:0;max-width:62ch;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.card{display:grid;gap:12px;padding:18px 16px;border:1px solid var(--line);border-radius:14px}
+.panel{display:grid;place-items:center;border-radius:10px;padding:28px 16px}
+.panel.light{background:#fff;border:1px solid rgba(20,20,20,.1)}.panel.dark{background:#141414}
+.lg{width:min(100%,150px);height:auto}
+.row{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.mini{height:auto;display:block}.tk{width:64px;height:64px}
+.sz{display:block}.sz .mk{width:100%;height:100%;display:block}
+</style></head><body><main class="wrap">
+<div style="display:grid;gap:8px"><h1>Square mark</h1><p>The final mark. Midnight navy, a white cut, emerald, and the orange dot.</p></div>
+<div class="grid">
+<article class="card"><header><h2>IssueSolved mark</h2><p>Midnight navy on top, a white cut, emerald below, and the orange dot.</p></header>
+  <div class="panel light"><svg class="lg" aria-hidden="true" viewBox="6.5 6.5 27 27"><path d="M7 33 L33 33 L33 20 Z" fill="#0F7B5F"/><path d="M7 33 L33 20 L33 7 Z" fill="#0A1F44"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></svg></div>
+  <div class="panel dark"><svg class="lg" aria-hidden="true" viewBox="6.5 6.5 27 27"><path d="M7 33 L33 33 L33 20 Z" fill="#2FC79B"/><path d="M7 33 L33 20 L33 7 Z" fill="#2A4A8F"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></svg></div>
+  <div class="row"><span class="sz"><svg class="mini" style="width:64px" aria-hidden="true" viewBox="6.5 6.5 27 27"><path d="M7 33 L33 33 L33 20 Z" fill="#0F7B5F"/><path d="M7 33 L33 20 L33 7 Z" fill="#0A1F44"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></svg></span><span class="sz"><svg class="mini" style="width:40px" aria-hidden="true" viewBox="6.5 6.5 27 27"><path d="M7 33 L33 33 L33 20 Z" fill="#0F7B5F"/><path d="M7 33 L33 20 L33 7 Z" fill="#0A1F44"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></svg></span><span class="sz"><svg class="mini" style="width:24px" aria-hidden="true" viewBox="6.5 6.5 27 27"><path d="M7 33 L33 33 L33 20 Z" fill="#0F7B5F"/><path d="M7 33 L33 20 L33 7 Z" fill="#0A1F44"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></svg></span>
+    <svg class="tk" aria-hidden="true" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#141414"/><g transform="translate(12 12)"><path d="M7 33 L33 33 L33 20 Z" fill="#2FC79B"/><path d="M7 33 L33 20 L33 7 Z" fill="#2A4A8F"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></g></svg><svg class="tk" aria-hidden="true" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#FFFFFF" stroke="rgba(20,20,20,.14)"/><g transform="translate(12 12)"><path d="M7 33 L33 33 L33 20 Z" fill="#0F7B5F"/><path d="M7 33 L33 20 L33 7 Z" fill="#0A1F44"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></g></svg>
+    <span class="sz" style="width:32px;height:32px"><svg class="mk" aria-hidden="true" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#141414"/><g transform="translate(12 12)"><path d="M7 33 L33 33 L33 20 Z" fill="#2FC79B"/><path d="M7 33 L33 20 L33 7 Z" fill="#2A4A8F"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></g></svg></span><span class="sz" style="width:16px;height:16px"><svg class="mk" aria-hidden="true" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#141414"/><g transform="translate(12 12)"><path d="M7 33 L33 33 L33 20 Z" fill="#2FC79B"/><path d="M7 33 L33 20 L33 7 Z" fill="#2A4A8F"/><path d="M7.00 33.00 L33.00 17.70 L33.00 22.30 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></g></svg></span></div>
+</article></div>
+</main></body></html>
