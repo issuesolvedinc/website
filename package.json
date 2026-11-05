@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/drop-internal-pages.mjs",
     "start": "npx serve build",
     "check:voice": "node scripts/check-voice.mjs"
   },
