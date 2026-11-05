@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="IssueSolved" viewBox="0 0 222 40">
+<g transform="translate(2 2) scale(1.3333333333333333) translate(-6.5 -6.5)"><path d="M7 33 L33 33 L33 20 Z" fill="#2FC79B"/><path d="M7 33 L33 20 L33 7 Z" fill="#2A4A8F"/><path d="M7 33 L33 17.7 L33 22.3 Z" fill="#FFFFFF"/><circle cx="13.64" cy="13.64" r="6.5" fill="#FF9A00"/></g>
+<rect x="51.1" y="3.1" width="72.6" height="33.8" rx="7.7" fill="none" stroke="#FF9A00" stroke-width="2.2" stroke-dasharray="6 3.5"/>
+<text x="87.4" y="26.3" font-family="'DM Sans', ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="600" letter-spacing="-0.48" fill="#F2EFE8" text-anchor="middle">Issue</text>
+<rect x="127.2" y="2" width="92.8" height="36" fill="#2FC79B"/>
+<text x="173.6" y="26.3" font-family="'DM Sans', ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="600" font-style="italic" letter-spacing="-0.48" fill="#141414" text-anchor="middle">Solved</text>
+</svg>
