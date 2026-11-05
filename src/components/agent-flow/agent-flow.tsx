@@ -19,6 +19,7 @@ import {
   type Node,
   type NodeProps,
 } from "@xyflow/react";
+import { FlowThemeStyle, lookAttrs, useFlowLook } from "@/components/flow-theme/flow-theme";
 import { cx } from "@/lib/cx";
 import {
   countRanks,
@@ -30,7 +31,8 @@ import {
   type FlowNode,
   type FlowPace,
 } from "@/lib/flow/definition";
-import { useMediaQuery, usePrefersReducedMotion } from "@/lib/use-media-query";
+import { DENSITY, type MotionLevel } from "@/lib/flow/theme";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { FlowSteps } from "./flow-steps";
 import { KindIcon } from "./kind-icon";
 
@@ -55,11 +57,18 @@ export type AgentFlowProps = {
   caption?: boolean;
   /** Live queue counts by node id, for an animation that fills or drains a step. Falls back to each node's own queue. */
   queues?: Record<string, number>;
+  /** A flow theme id. Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string;
+  /**
+   * Overrides the theme's motion level. "still" stops the lights, "subtle" keeps them and drops the running
+   * highlight. Reduced motion always wins.
+   */
+  motion?: MotionLevel;
   className?: string;
 };
 
 type StepData = { step: FlowNode; direction: FlowDirection; active: boolean; queue: number };
-type LinkData = { label?: string; loop: boolean; animated: boolean; pace?: FlowPace };
+type LinkData = { label?: string; loop: boolean; animated: boolean; pace?: FlowPace; corner: number };
 type StepNode = Node<StepData, "step">;
 type LinkEdge = Edge<LinkData, "link">;
 
@@ -88,10 +97,14 @@ function AgentFlowCanvas({
   textList = true,
   caption = true,
   queues,
+  theme,
+  motion,
   className,
 }: AgentFlowProps) {
   const narrow = useMediaQuery("(max-width: 40rem)");
-  const reduced = usePrefersReducedMotion();
+  const look = useFlowLook(theme, motion);
+  const gap = DENSITY[look.theme.density].gap;
+  const corner = Math.min(12, look.theme.shape.radius * 1.2);
   const frame = useRef<HTMLElement>(null);
   const [width, setWidth] = useState(0);
   useEffect(() => {
@@ -102,10 +115,10 @@ function AgentFlowCanvas({
     return () => ro.disconnect();
   }, []);
   const ranks = countRanks(flow);
-  const across = (ranks - 1) * RANK_GAP + NODE_WIDTH;
+  const across = (ranks - 1) * RANK_GAP * gap + NODE_WIDTH;
   const fitsAcross = !narrow && width * (1 - 2 * FIT.padding) >= across * MIN_ACROSS_ZOOM;
   const dir: FlowDirection = direction === "auto" ? (fitsAcross ? "horizontal" : "vertical") : direction;
-  const moving = animated && !reduced;
+  const moving = animated && look.motion !== "still";
   const explore = interactive && !narrow;
   const { fitView, zoomIn, zoomOut } = useReactFlow();
 
@@ -121,7 +134,7 @@ function AgentFlowCanvas({
     return () => io.disconnect();
   }, []);
   useEffect(() => setTick(0), [flow]);
-  const run = running && moving && onScreen;
+  const run = running && look.fx && onScreen;
   useEffect(() => {
     if (!run) return;
     const t = setInterval(() => setTick((n) => n + 1), 1700);
@@ -132,9 +145,13 @@ function AgentFlowCanvas({
 
   // A step with a queue is taller, so a flow that has one gets more room between steps when it runs down.
   const hasQueue = queues !== undefined || flow.nodes.some((n) => n.queue);
-  const downGap = hasQueue ? 210 : 150;
+  const downGap = (hasQueue ? 210 : 150) * gap;
   const { nodes, edges } = useMemo(() => {
-    const at = layoutFlow(flow, { direction: dir, rankGap: dir === "horizontal" ? RANK_GAP : downGap });
+    const at = layoutFlow(flow, {
+      direction: dir,
+      rankGap: dir === "horizontal" ? RANK_GAP * gap : downGap,
+      laneGap: (dir === "horizontal" ? 130 : 260) * gap,
+    });
     const nodes: StepNode[] = flow.nodes.map((n) => ({
       id: n.id,
       type: "step",
@@ -152,12 +169,12 @@ function AgentFlowCanvas({
         type: "link",
         sourceHandle: loop ? "loop-out" : "out",
         targetHandle: loop ? "loop-in" : "in",
-        data: { label: e.label, loop, animated: moving, pace: e.pace },
+        data: { label: e.label, loop, animated: moving, pace: e.pace, corner },
         focusable: false,
       };
     });
     return { nodes, edges };
-  }, [flow, dir, moving, activeId, queues, downGap]);
+  }, [flow, dir, moving, activeId, queues, downGap, gap, corner]);
 
   // Fit again when the box changes size or the direction flips.
   useEffect(() => {
@@ -177,7 +194,8 @@ function AgentFlowCanvas({
   const autoHeight = dir === "horizontal" ? 320 : ranks * downGap + 40;
 
   return (
-    <figure ref={frame} className={cx("agent-flow", className)}>
+    <figure ref={frame} className={cx("agent-flow", className)} {...lookAttrs(look)}>
+      <FlowThemeStyle theme={look.theme} />
       <div className={cx("flex items-baseline justify-between gap-4 pb-3", !caption && "sr-only")}>
         <figcaption className="text-sm font-semibold text-fg">{flow.title}</figcaption>
         {flow.example && <span className="af-tag">Example</span>}
@@ -268,7 +286,7 @@ function LinkView({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targ
   const loop = data?.loop ?? false;
   const pace = data?.pace ? PACE[data.pace] : undefined;
   const [path, labelX, labelY] = loop
-    ? getSmoothStepPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset: 36, borderRadius: 12 })
+    ? getSmoothStepPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, offset: 36, borderRadius: data?.corner ?? 12 })
     : getBezierPath({ sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition });
   return (
     <>

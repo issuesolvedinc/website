@@ -15,10 +15,12 @@ import {
   Wordmark,
 } from "@/components";
 import { AgentFlow } from "@/components/agent-flow/agent-flow";
+import { FlowThemeLab } from "@/components/flow-theme/flow-theme-lab";
 import { BackgroundBeams } from "@/components/effects/background-beams";
 import { BackgroundBeamsWithCollision } from "@/components/effects/background-beams-with-collision";
 import { BackgroundLines } from "@/components/effects/background-lines";
 import { drawingReviewFlow, rfiFlow } from "@/content/example-flows";
+import { FLOW_THEMES } from "@/lib/flow/theme";
 
 export const metadata: Metadata = {
   title: "Design system | IssueSolved",
@@ -479,6 +481,33 @@ export default function DesignSystem() {
               Example flows carry <Code>example: true</Code> and show the Example tag. They describe generic
               engineering firm work, not a client.
             </Text>
+          </Demo>
+        </Section>
+
+        <Section id="flow-themes" number="10" title="Flow themes">
+          <Text>
+            A flow theme sets how any flow looks and moves: colour, type, shapes, motion and density. It is plain data in{" "}
+            <Code>src/lib/flow/theme.ts</Code>, kept apart from the flow definition, so the same flow draws under any
+            theme by changing one value. Reduced motion always wins over the theme. Light and dark follow the page.
+          </Text>
+          <Table
+            caption="Themes"
+            captionVisible
+            columns={["Theme", "Motion", "Density", "When to use it"]}
+            rows={FLOW_THEMES.map((t) => [<Code key="t">{t.id}</Code>, t.motion, t.density, t.description])}
+          />
+          <Table
+            caption="Motion levels"
+            captionVisible
+            columns={["Level", "What moves"]}
+            rows={[
+              [<Code key="m">still</Code>, "One frame. Nothing moves."],
+              [<Code key="m">subtle</Code>, "The work: items travel, queues fill and drain, counts climb, clocks run."],
+              [<Code key="m">animated</Code>, "The work, plus ripples, the sweep, the shake, marching wires and moving figures."],
+            ]}
+          />
+          <Demo name="FlowThemeLab">
+            <FlowThemeLab />
           </Demo>
         </Section>
       </main>
