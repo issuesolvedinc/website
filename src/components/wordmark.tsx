@@ -7,16 +7,18 @@ type WordmarkProps = {
 };
 
 /**
- * The IssueSolved wordmark, set in the site's sans. Size it with a text size class. Takes the current text color, so
- * it is ink on paper and chalk on night.
+ * The IssueSolved wordmark, drawn like two nodes of the process flow: "Issue" in a rounded, dashed orange outline
+ * (work still waiting), then "Solved" in italic inside a square cornered green outline (work done). Both words take the text colour. No fills, no check.
+ * Size it with a text size class.
  */
 export function Wordmark({ className, decorative = false }: WordmarkProps) {
   return (
     <span
-      className={cx("block font-sans font-semibold leading-none tracking-[-0.02em]", className)}
+      className={cx("wordmark inline-flex items-center font-sans font-semibold leading-none tracking-[-0.02em]", className)}
       {...(decorative ? { "aria-hidden": true } : {})}
     >
-      IssueSolved
+      <span className="wordmark-issue">Issue</span>
+      <span className="wordmark-solved">Solved</span>
     </span>
   );
 }

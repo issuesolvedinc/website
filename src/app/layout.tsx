@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { DM_Mono, DM_Sans, Source_Serif_4 } from "next/font/google";
+import { THEME_SCRIPT } from "@/components/theme-toggle";
 import { HEADLINE } from "@/content/headline";
 import "./globals.css";
 
@@ -8,6 +10,7 @@ import "./globals.css";
 const sans = DM_Sans({
   subsets: ["latin"],
   axes: ["opsz"],
+  style: ["normal", "italic"],
   variable: "--font-dm-sans",
   display: "swap",
 });
@@ -41,8 +44,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-CA" className={`${sans.variable} ${serif.variable} ${mono.variable}`}>
-      <body>{children}</body>
+    <html lang="en-CA" className={`${sans.variable} ${serif.variable} ${mono.variable}`} suppressHydrationWarning>
+      <body>
+        {/* Applies a saved theme before the page paints. */}
+        <Script id="theme" strategy="beforeInteractive">
+          {THEME_SCRIPT}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

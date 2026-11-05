@@ -1,0 +1,338 @@
+/*
+  Services and Get started (service-rows.tsx). Main map pill nodes, one size per breakpoint, centred. Phones:
+  label above, boxes stacked, Get started runs down. Wide screens (xl): label on the left, with an equal spacer on
+  the right so the nodes sit on the centre line of the page.
+*/
+.sr {
+  --sr-w: 9rem;
+  --sr-h: 3.25rem;
+  --sr-gap: 2.25rem;
+  --sr-edge: color-mix(in srgb, var(--fg) 16%, transparent);
+  --sr-wire: color-mix(in srgb, var(--fg) 30%, var(--bg));
+  --sr-card: color-mix(in srgb, var(--bg) 45%, white);
+  display: grid;
+  gap: 2.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sr {
+    --sr-card: color-mix(in srgb, var(--bg) 86%, white);
+  }
+}
+[data-theme="dark"] .sr {
+  --sr-card: color-mix(in srgb, var(--bg) 86%, white);
+}
+@media (min-width: 48rem) {
+  .sr {
+    --sr-w: 10rem;
+    --sr-h: 3.5rem;
+    --sr-gap: 3rem;
+    gap: 3rem;
+  }
+}
+
+.sr ul,
+.sr ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sr-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+}
+.sr-label {
+  align-self: flex-start;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.sr-spacer {
+  display: none;
+}
+@media (min-width: 80rem) {
+  .sr-row {
+    display: grid;
+    grid-template-columns: 8rem 1fr 8rem;
+    align-items: center;
+    justify-items: center;
+    gap: 1.5rem;
+  }
+  .sr-label {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+  .sr-groups,
+  .sr-steps {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .sr-spacer {
+    display: block;
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+/* boxes, one per service */
+.sr-groups {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1.25rem;
+  width: 100%;
+}
+.sr-box {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  padding: 1.125rem 0.5rem;
+  border: 1px solid var(--sr-edge);
+  border-radius: 12px;
+}
+@media (min-width: 48rem) {
+  .sr-box {
+    width: auto;
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* the node: the main map's pill */
+.sr-node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: var(--sr-w);
+  height: var(--sr-h);
+  padding: 0 0.625rem;
+  background: var(--sr-card);
+  border: 1px solid var(--sr-edge);
+  border-radius: 10px;
+  color: var(--fg);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+@media (min-width: 48rem) {
+  .sr-node {
+    gap: 0.625rem;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+.sr-end {
+  border-color: var(--orange);
+}
+.sr-tile {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+}
+.sr-tile svg {
+  width: 14px;
+  height: 14px;
+}
+.sr-n {
+  position: absolute;
+  top: -13px;
+  left: -13px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid var(--fg);
+  border-radius: 50%;
+  background: var(--bg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.sr-end .sr-n {
+  border-color: var(--orange);
+}
+
+/* wires, ports, dots */
+.sr-wire {
+  position: relative;
+  flex: none;
+  background: var(--sr-wire);
+}
+.sr-down,
+.sr-across {
+  width: 2px;
+  height: 28px;
+}
+.sr-port {
+  position: absolute;
+  z-index: 2;
+  width: 8px;
+  height: 8px;
+  border: 1.5px solid var(--fg);
+  border-radius: 50%;
+  background: var(--bg);
+  transform: translate(-50%, -50%);
+}
+.sr-down .sr-a,
+.sr-across .sr-a {
+  left: 50%;
+  top: 0;
+}
+.sr-down .sr-b,
+.sr-across .sr-b {
+  left: 50%;
+  top: 100%;
+}
+.sr-dot {
+  position: absolute;
+  z-index: 3;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--dc);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dc) 22%, transparent);
+  opacity: 0;
+  animation: 2.4s linear var(--d, 0s) infinite;
+}
+.sr-down .sr-dot,
+.sr-across .sr-dot {
+  left: 50%;
+  animation-name: sr-down;
+}
+@keyframes sr-down {
+  0% { top: 0; opacity: 0; }
+  8% { opacity: 1; }
+  40% { top: 100%; opacity: 1; }
+  46%, 100% { top: 100%; opacity: 0; }
+}
+@keyframes sr-across {
+  0% { left: 0; opacity: 0; }
+  8% { opacity: 1; }
+  40% { left: 100%; opacity: 1; }
+  46%, 100% { left: 100%; opacity: 0; }
+}
+
+/* service shapes: a stack, and a fork that joins two words into a third */
+.sr-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sr-fork {
+  display: grid;
+  grid-template-columns: var(--sr-w) var(--sr-gap) var(--sr-w);
+}
+.sr-and {
+  display: grid;
+  place-items: center;
+  color: var(--fg-muted);
+  font-size: 0.875rem;
+}
+.sr-last {
+  grid-column: 1 / -1;
+  justify-self: center;
+}
+.sr-merge {
+  position: relative;
+  grid-column: 1 / -1;
+  height: 32px;
+}
+.sr-arm {
+  position: absolute;
+  top: 0;
+  height: 50%;
+  border: 0 solid var(--sr-wire);
+  border-bottom-width: 2px;
+}
+.sr-arm.sr-l {
+  left: calc(var(--sr-w) / 2 - 1px);
+  right: 50%;
+  border-left-width: 2px;
+}
+.sr-arm.sr-r {
+  left: 50%;
+  right: calc(var(--sr-w) / 2 - 1px);
+  border-right-width: 2px;
+}
+.sr-stem {
+  position: absolute;
+  left: calc(50% - 1px);
+  top: 50%;
+  width: 2px;
+  height: 50%;
+  background: var(--sr-wire);
+}
+.sr-pl { left: calc(var(--sr-w) / 2); top: 0; }
+.sr-pr { left: calc(100% - var(--sr-w) / 2); top: 0; }
+.sr-pc { left: 50%; top: 100%; }
+.sr-ml { animation-name: sr-merge-l; }
+.sr-mr { animation-name: sr-merge-r; }
+@keyframes sr-merge-l {
+  0% { left: calc(var(--sr-w) / 2); top: 0; opacity: 0; }
+  6% { opacity: 1; }
+  25% { left: calc(var(--sr-w) / 2); top: 50%; }
+  45% { left: 50%; top: 50%; }
+  60% { left: 50%; top: 100%; opacity: 1; }
+  66%, 100% { left: 50%; top: 100%; opacity: 0; }
+}
+@keyframes sr-merge-r {
+  0% { left: calc(100% - var(--sr-w) / 2); top: 0; opacity: 0; }
+  6% { opacity: 1; }
+  25% { left: calc(100% - var(--sr-w) / 2); top: 50%; }
+  45% { left: 50%; top: 50%; }
+  60% { left: 50%; top: 100%; opacity: 1; }
+  66%, 100% { left: 50%; top: 100%; opacity: 0; }
+}
+
+/* Get started: runs down on phones, across from md */
+.sr-steps,
+.sr-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+@media (min-width: 48rem) {
+  .sr-steps,
+  .sr-step {
+    flex-direction: row;
+  }
+  .sr-across {
+    width: var(--sr-gap);
+    height: 2px;
+  }
+  .sr-across .sr-a { left: 0; top: 50%; }
+  .sr-across .sr-b { left: 100%; top: 50%; }
+  .sr-across .sr-dot {
+    top: 50%;
+    left: 0;
+    animation-name: sr-across;
+  }
+}
+
+/* reduced motion: every dot rests mid wire */
+@media (prefers-reduced-motion: reduce) {
+  .sr-dot {
+    animation: none;
+    opacity: 1;
+  }
+  .sr-down .sr-dot,
+  .sr-across .sr-dot {
+    top: 50%;
+    left: 50%;
+  }
+  .sr-ml {
+    left: calc(var(--sr-w) / 2 + 25%);
+    top: 50%;
+  }
+  .sr-mr {
+    display: none;
+  }
+}

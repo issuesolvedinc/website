@@ -6,7 +6,7 @@ import { Button } from "@/components/button";
 /*
   The one call to action. Contact opens a short form; it posts to the Netlify form "waitlist", declared for
   Netlify in public/__forms.html. If sending fails, the address is shown instead, so nobody is left without a way
-  to reach us. On hover or focus a check slides into the button.
+  to reach us. On hover or focus a check slides into the button. Buttons are outlined, never filled dark.
 */
 const FORM = "waitlist";
 const parts = ["contact", "issuesolved.ca"];
@@ -35,14 +35,24 @@ function Check() {
 
 export function ContactReveal() {
   const [state, setState] = useState<State>("closed");
-
-  if (state === "closed")
-    return (
-      <Button className="group" onClick={() => setState("open")}>
+  // Contact stays on top; the form opens under it, and a second press closes it.
+  return (
+    <div className="flex w-full flex-col items-center gap-6">
+      <Button
+        variant="secondary"
+        className="group rounded-[10px] border-dashed"
+        aria-expanded={state !== "closed"}
+        onClick={() => setState(state === "closed" ? "open" : state === "sent" ? "sent" : "closed")}
+      >
         <Check />
         Contact
       </Button>
-    );
+      {state !== "closed" && <ContactForm state={state} setState={setState} />}
+    </div>
+  );
+}
+
+function ContactForm({ state, setState }: { state: State; setState: (s: State) => void }) {
 
   if (state === "sent")
     return (
@@ -101,7 +111,7 @@ export function ContactReveal() {
           .
         </p>
       )}
-      <Button type="submit" className="group self-center" disabled={state === "sending"}>
+      <Button type="submit" variant="secondary" className="group self-center" disabled={state === "sending"}>
         <Check />
         {state === "sending" ? "Sending" : "Send"}
       </Button>
