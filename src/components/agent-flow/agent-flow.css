@@ -1,6 +1,6 @@
 /*
   AgentFlow styles. Only React Flow's base.css is loaded, never its default theme:
-  every color here comes from the design tokens, so light and dark follow the page.
+  every color here comes from the design tokens or the flow theme (--ft-*), so light and dark follow the page.
 */
 
 .agent-flow .react-flow {
@@ -11,14 +11,14 @@
 .af-canvas {
   border: 1px solid var(--rule);
   background:
-    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--fg) 14%, transparent) 1px, transparent 0) 0 0 / 20px 20px;
+    radial-gradient(circle at 1px 1px, var(--ft-grid) 1px, transparent 0) 0 0 / 20px 20px;
   touch-action: pan-y;
 }
 
 .af-tag {
-  font-family: var(--font-mono);
+  font-family: var(--ft-label);
   font-size: var(--text-xs);
-  color: var(--accent-fg);
+  color: var(--ft-accent-text);
   border: 1px solid currentColor;
   padding: 0 0.4rem;
 }
@@ -28,19 +28,19 @@
   width: 216px;
   display: grid;
   gap: 0.2rem;
-  padding: 0.7rem 0.85rem 0.8rem;
+  padding: var(--ft-pad);
   background: var(--glass);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid var(--glass-edge);
   color: var(--fg);
-  font-family: var(--font-serif);
+  font-family: var(--ft-text);
 }
 .af-kind {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  font-family: var(--font-mono);
+  font-family: var(--ft-label);
   font-size: var(--text-xs);
   color: var(--fg-muted);
 }
@@ -66,11 +66,11 @@
   border-color: var(--fg);
 }
 .af-agent {
-  border-color: var(--accent);
-  box-shadow: inset 3px 0 0 var(--accent);
+  border-color: var(--ft-accent);
+  box-shadow: inset 3px 0 0 var(--ft-accent);
 }
 .af-agent .af-kind {
-  color: var(--accent-fg);
+  color: var(--ft-accent-text);
 }
 .af-person {
   border-color: var(--fg);
@@ -102,11 +102,11 @@
   transition: box-shadow 300ms ease, transform 300ms ease, border-color 400ms ease, background-color 400ms ease;
 }
 .af-active {
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ft-accent) 28%, transparent);
   transform: translateY(-2px);
 }
 .af-agent.af-active {
-  box-shadow: inset 3px 0 0 var(--accent), 0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent);
+  box-shadow: inset 3px 0 0 var(--ft-accent), 0 0 0 4px color-mix(in srgb, var(--ft-accent) 28%, transparent);
 }
 @media (prefers-reduced-motion: reduce) {
   .af-node {
@@ -145,13 +145,13 @@
 .af-pips i {
   width: 9px;
   height: 9px;
-  background: var(--accent);
+  background: var(--ft-accent);
   animation: af-pip-in 260ms ease-out;
 }
 .af-count {
-  font-family: var(--font-mono);
+  font-family: var(--ft-label);
   font-size: var(--text-xs);
-  color: var(--accent-fg);
+  color: var(--ft-accent-text);
   font-variant-numeric: tabular-nums;
 }
 .af-output .af-count {
@@ -167,6 +167,15 @@
     animation: none;
   }
 }
+/* Only the animated level lifts and pops; still holds every step in place. */
+[data-flow-motion="still"] .af-node,
+[data-flow-motion="subtle"] .af-node {
+  transition: none;
+}
+[data-flow-motion="still"] .af-pips i,
+[data-flow-motion="subtle"] .af-pips i {
+  animation: none;
+}
 
 /* Arrows */
 .agent-flow .af-edge {
@@ -177,14 +186,14 @@
   stroke-dasharray: 4 4;
 }
 .af-spark {
-  fill: var(--accent);
+  fill: var(--ft-accent);
 }
 .af-item {
-  fill: var(--accent);
+  fill: var(--ft-accent);
 }
 .af-edge-label {
   position: absolute;
-  font-family: var(--font-mono);
+  font-family: var(--ft-label);
   font-size: 11px;
   color: var(--fg-muted);
   background: var(--bg);

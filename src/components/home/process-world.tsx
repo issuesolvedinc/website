@@ -13,8 +13,15 @@ import type {
   When,
   Who,
 } from "@/content/process-worlds";
+import {
+  FlowThemeStyle,
+  LookProvider,
+  lookAttrs,
+  useFlowLook,
+  useLook,
+} from "@/components/flow-theme/flow-theme";
 import { cx } from "@/lib/cx";
-import { usePrefersReducedMotion } from "@/lib/use-media-query";
+import type { FlowTheme, MotionLevel } from "@/lib/flow/theme";
 
 /*
   One business process on a node canvas, alive. Work arrives from its sources (emails, scans, forms, calls) and
@@ -52,41 +59,42 @@ const SETTLE = 0.6;
 const DROP = 1.0;
 const SWEEP = 1.2;
 
+/** Tool and item colours come from the flow theme (src/lib/flow/theme.ts) as CSS variables. */
 export const TOOL: Record<Tool, string> = {
-  email: "#2f6feb",
-  pdf: "#e5484d",
-  form: "#6e56cf",
-  phone: "#12a594",
-  chat: "#8e4ec6",
-  sheet: "#1f9d55",
-  ledger: "#0d9488",
-  crm: "#f76b15",
-  billing: "#0091ff",
-  projects: "#3e63dd",
-  calendar: "#e54666",
-  approval: "#e79c00",
-  wait: "#8d8d86",
-  docs: "#a1724e",
-  video: "#0ea5e9",
-  plans: "#6e56cf",
-  contract: "#d6409f",
-  backlog: "#3e63dd",
-  delivered: "var(--orange)",
-  agent: "var(--fg)",
-  you: "var(--fg)",
-  team: "var(--fg)",
+  email: "var(--ft-tool-email)",
+  pdf: "var(--ft-tool-pdf)",
+  form: "var(--ft-tool-form)",
+  phone: "var(--ft-tool-phone)",
+  chat: "var(--ft-tool-chat)",
+  sheet: "var(--ft-tool-sheet)",
+  ledger: "var(--ft-tool-ledger)",
+  crm: "var(--ft-tool-crm)",
+  billing: "var(--ft-tool-billing)",
+  projects: "var(--ft-tool-projects)",
+  calendar: "var(--ft-tool-calendar)",
+  approval: "var(--ft-tool-approval)",
+  wait: "var(--ft-tool-wait)",
+  docs: "var(--ft-tool-docs)",
+  video: "var(--ft-tool-video)",
+  plans: "var(--ft-tool-plans)",
+  contract: "var(--ft-tool-contract)",
+  backlog: "var(--ft-tool-backlog)",
+  delivered: "var(--ft-tool-delivered)",
+  agent: "var(--ft-tool-agent)",
+  you: "var(--ft-tool-you)",
+  team: "var(--ft-tool-team)",
 };
 export const ITEM: Record<ItemKind, string> = {
-  mail: "#2f6feb",
-  pdf: "#e5484d",
-  form: "#6e56cf",
-  call: "#12a594",
-  chat: "#8e4ec6",
-  plan: "#6e56cf",
-  contract: "#d6409f",
+  mail: "var(--ft-item-mail)",
+  pdf: "var(--ft-item-pdf)",
+  form: "var(--ft-item-form)",
+  call: "var(--ft-item-call)",
+  chat: "var(--ft-item-chat)",
+  plan: "var(--ft-item-plan)",
+  contract: "var(--ft-item-contract)",
 };
-export const HOT = "#e5484d";
-export const AMBER = "#e79c00";
+export const HOT = "var(--ft-hot)";
+export const AMBER = "var(--ft-warn)";
 
 export type P2 = { x: number; y: number };
 const pick = <T,>(v: Both<T>, p: Phase): T =>
@@ -408,6 +416,12 @@ function still(G: Graph, seconds: number): Sim {
 // ---------- Drawing ----------
 
 /** A tool's icon, white on its colour, in an 18 by 18 box. */
+/** A card's header band: rounded at the top to the card's corner, square when the theme has square corners. */
+export function headPath(x: number, y: number, w: number, head: number, r: number) {
+  if (r <= 0) return `M${x} ${y + head} V${y} H${x + w} V${y + head} Z`;
+  return `M${x} ${y + head} V${y + r} A${r} ${r} 0 0 1 ${x + r} ${y} H${x + w - r} A${r} ${r} 0 0 1 ${x + w} ${y + r} V${y + head} Z`;
+}
+
 export function Glyph({ tool }: { tool: Tool }) {
   switch (tool) {
     case "email":
@@ -566,12 +580,13 @@ export function Tile({
   size?: number;
 }) {
   const ink = tool === "agent" || tool === "you" || tool === "team";
+  const { theme } = useLook();
   return (
     <g transform={`translate(${x} ${y})`}>
       <rect
         width={size}
         height={size}
-        rx={size * 0.28}
+        rx={size * theme.shape.tile}
         style={{ fill: TOOL[tool] }}
       />
       <g
@@ -607,7 +622,7 @@ export function Token({
           width={13}
           height={10}
           rx={2.5}
-          style={{ fill: "var(--ok)" }}
+          style={{ fill: "var(--ft-ok)" }}
         />
         <path d="M-2.8 0 L-0.7 2.1 L3 -2" className="pw-tick" />
       </>
@@ -736,13 +751,16 @@ function Figure({
   st: NodeState;
 }) {
   const after = s.phase === "after";
+  // Figures move only at the animated level; below it they hold one pose.
+  const { fx } = useLook();
+  const time = fx ? s.time : 0;
   if (who === "agent") {
-    const spin = (s.time * 140) % 360;
+    const spin = (time * 140) % 360;
     return (
       <g>
         <circle cx={c.x} cy={c.y} r={19} className="pw-orbit" />
         {(["mail", "pdf", "form"] as ItemKind[]).map((k, i) => {
-          const a = s.time * 2.2 + (i * Math.PI * 2) / 3;
+          const a = time * 2.2 + (i * Math.PI * 2) / 3;
           return (
             <circle
               key={k}
@@ -768,7 +786,8 @@ function Figure({
   if (who === "you") {
     if (after) {
       const since = s.time - st.hit;
-      const hop = since < 0.35 ? Math.sin((since / 0.35) * Math.PI) * 3.5 : 0;
+      const hop =
+        fx && since < 0.35 ? Math.sin((since / 0.35) * Math.PI) * 3.5 : 0;
       return (
         <g
           transform={`translate(${c.x - 2} ${c.y - hop}) scale(0.8)`}
@@ -781,7 +800,7 @@ function Figure({
           <path d="M5 -3 L12 -12" className="pw-limb pw-thin" />
           <rect x={9} y={-18} width={6.5} height={6} rx={2} />
           <path d="M11 -18 V-23" className="pw-limb pw-thumb" />
-          <circle cx={20} cy={4} r={6} style={{ fill: "var(--ok)" }} />
+          <circle cx={20} cy={4} r={6} style={{ fill: "var(--ft-ok)" }} />
           <path d="M17.4 4.2 L19.3 6 L22.6 2.5" className="pw-tick" />
         </g>
       );
@@ -796,7 +815,7 @@ function Figure({
           <path d="M-13 16 Q-12 2 0 5 Q12 8 13 16 Z" />
         </g>
         {[0, 0.5].map((k) => {
-          const f = (s.time * 0.55 + k) % 1;
+          const f = (time * 0.55 + k) % 1;
           return (
             <text
               key={k}
@@ -814,7 +833,7 @@ function Figure({
   }
   if (n.hold !== undefined) {
     const flip =
-      Math.floor(s.time / 1.6) * 180 + Math.min(1, (s.time % 1.6) / 0.35) * 180;
+      Math.floor(time / 1.6) * 180 + Math.min(1, (time % 1.6) / 0.35) * 180;
     return (
       <g>
         <circle
@@ -845,7 +864,7 @@ function Figure({
       {who === "person" ? (
         <g
           className="pw-ink"
-          transform={`translate(${c.x} ${c.y + (busy ? Math.sin(s.time * 18) * 0.6 : 0)})`}
+          transform={`translate(${c.x} ${c.y + (busy ? Math.sin(time * 18) * 0.6 : 0)})`}
         >
           <circle cx={0} cy={-4.5} r={4.6} />
           <path d="M-8.5 9.5 A8.5 8.5 0 0 1 8.5 9.5 Z" />
@@ -865,7 +884,7 @@ function Figure({
           <circle
             key={k}
             cx={c.x - 5 + k * 5}
-            cy={c.y + 21 - Math.max(0, Math.sin(s.time * 9 - k * 0.8)) * 2.5}
+            cy={c.y + 21 - Math.max(0, Math.sin(time * 9 - k * 0.8)) * 2.5}
             r={1.5}
             className="pw-dots"
           />
@@ -875,6 +894,8 @@ function Figure({
 }
 
 function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
+  const { theme, fx } = useLook();
+  const { radius: r, glow } = theme.shape;
   const P = s.phase;
   const after = P === "after";
   const st = s.nodes[n.id];
@@ -889,9 +910,10 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
   const load = Math.min(1, pile.length / CAP);
   const hot = !after && load > 0.3 ? (load - 0.3) / 0.7 : 0;
   const ok = after && on(n.when, P) && (who === "agent" || who === "you");
-  const shake = !after && load > 0.85 ? Math.sin(s.time * 47 + i) * 1.3 : 0;
+  const shake =
+    fx && !after && load > 0.85 ? Math.sin(s.time * 47 + i) * 1.3 : 0;
   const since = s.time - st.hit;
-  const pulse = since < 0.35 ? 1 - since / 0.35 : 0;
+  const pulse = fx && since < 0.35 ? 1 - since / 0.35 : 0;
   const p = [inPort(n), outPort(n)];
 
   if (n.src) {
@@ -902,7 +924,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
           y={n.y}
           width={n.w}
           height={n.h}
-          rx={9}
+          rx={Math.max(0, r - 1)}
           className="pw-card"
         />
         <circle
@@ -923,7 +945,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
   const progress = st.busy ? 1 - st.busy.left / (st.busy.total || 1) : 0;
   const per = 7;
   const edge = ok
-    ? "var(--ok)"
+    ? "var(--ft-ok)"
     : hot
       ? `color-mix(in srgb, ${HOT} ${Math.round(hot * 100)}%, var(--pw-edge))`
       : undefined;
@@ -933,17 +955,17 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
       className={cx("pw-node", gone && "pw-gone")}
       transform={shake ? `translate(${shake.toFixed(2)} 0)` : undefined}
     >
-      {(hot > 0 || ok) && (
+      {glow > 0 && (hot > 0 || ok) && (
         <rect
           x={n.x - 6}
           y={n.y - 6}
           width={n.w + 12}
           height={n.h + 12}
-          rx={14}
+          rx={r ? r + 4 : 0}
           className="pw-heat"
           style={{
-            fill: ok ? "var(--ok)" : HOT,
-            opacity: ok ? 0.16 : hot * 0.3,
+            fill: ok ? "var(--ft-ok)" : HOT,
+            opacity: (ok ? 0.16 : hot * 0.3) * glow,
           }}
         />
       )}
@@ -952,7 +974,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
         y={n.y}
         width={n.w}
         height={n.h}
-        rx={10}
+        rx={r}
         className="pw-card"
         style={
           edge
@@ -961,7 +983,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
         }
       />
       <path
-        d={`M${n.x} ${n.y + HEAD} V${n.y + 10} A10 10 0 0 1 ${n.x + 10} ${n.y} H${n.x + n.w - 10} A10 10 0 0 1 ${n.x + n.w} ${n.y + 10} V${n.y + HEAD} Z`}
+        d={headPath(n.x, n.y, n.w, HEAD, r)}
         className="pw-head"
       />
       <Tile tool={tool} x={n.x + 6} y={n.y + 4} />
@@ -1006,7 +1028,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
             width={(n.w - 58) * Math.max(0, Math.min(1, progress))}
             height={3}
             rx={1.5}
-            style={{ fill: who === "agent" ? "var(--ok)" : TOOL[tool] }}
+            style={{ fill: who === "agent" ? "var(--ft-ok)" : TOOL[tool] }}
           />
         </g>
       )}
@@ -1033,17 +1055,17 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
       })}
 
       {s.rings
-        .filter((r) => r.at === n.id)
-        .map((r) => {
+        .filter((g) => fx && g.at === n.id)
+        .map((g) => {
           const c = spot(n);
           return (
             <circle
-              key={r.id}
+              key={g.id}
               cx={c.x}
               cy={c.y}
-              r={14 + (r.t / SETTLE) * 18}
+              r={14 + (g.t / SETTLE) * 18}
               className="pw-settle"
-              style={{ opacity: 0.8 * (1 - r.t / SETTLE) }}
+              style={{ opacity: 0.8 * (1 - g.t / SETTLE) }}
             />
           );
         })}
@@ -1055,6 +1077,7 @@ function Card({ n, s, i }: { n: Placed; s: Sim; i: number }) {
 }
 
 function Canvas({ grid }: { grid: string }) {
+  const rx = useLook().theme.shape.frame;
   return (
     <>
       <defs>
@@ -1076,8 +1099,8 @@ function Canvas({ grid }: { grid: string }) {
           <feGaussianBlur stdDeviation="6" />
         </filter>
         <linearGradient id={`${grid}-sweep`} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor="var(--ok)" stopOpacity="0" />
-          <stop offset="1" stopColor="var(--ok)" stopOpacity="0.28" />
+          <stop offset="0" style={{ stopColor: "var(--ft-ok)", stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: "var(--ft-ok)", stopOpacity: 0.28 }} />
         </linearGradient>
       </defs>
       <rect
@@ -1085,7 +1108,7 @@ function Canvas({ grid }: { grid: string }) {
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={rx}
         className="pw-canvas"
       />
       <rect
@@ -1093,7 +1116,7 @@ function Canvas({ grid }: { grid: string }) {
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={rx}
         fill={`url(#${grid}-minor)`}
       />
       <rect
@@ -1101,7 +1124,7 @@ function Canvas({ grid }: { grid: string }) {
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={rx}
         className="pw-frame"
       />
     </>
@@ -1109,6 +1132,7 @@ function Canvas({ grid }: { grid: string }) {
 }
 
 function Scene({ G, s }: { G: Graph; s: Sim }) {
+  const { fx } = useLook();
   const uid = "pw" + useId().replace(/[^a-zA-Z0-9]/g, "");
   const canvas = useMemo(() => <Canvas grid={uid} />, [uid]);
   const after = s.phase === "after";
@@ -1119,7 +1143,8 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
     .sort(
       (a, b) => +on(G.wires[a].when, s.phase) - +on(G.wires[b].when, s.phase),
     );
-  const sweeping = after && s.clock < SWEEP;
+  // The sweep still turns before into after at every level; only its line is an effect.
+  const sweeping = fx && after && s.clock < SWEEP;
   const sweepX = (s.clock / SWEEP) * W;
 
   return (
@@ -1136,10 +1161,10 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
         const n = load.get(i) ?? 0;
         const tone =
           after && live && !G.byId[w.from].src
-            ? "var(--ok)"
+            ? "var(--ft-ok)"
             : w.back
               ? AMBER
-              : "var(--flow)";
+              : "var(--ft-flow)";
         return (
           <g
             key={i}
@@ -1182,7 +1207,11 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
           <g
             key={d.id}
             style={{ opacity: 1 - t / DROP }}
-            transform={`rotate(${t * 160} ${d.x - 8 - t * 18} ${d.y + t * t * 110})`}
+            transform={
+              fx
+                ? `rotate(${t * 160} ${d.x - 8 - t * 18} ${d.y + t * t * 110})`
+                : undefined
+            }
           >
             <Token item={d} p={{ x: d.x - 8 - t * 18, y: d.y + t * t * 110 }} />
           </g>
@@ -1194,7 +1223,7 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
         const p = pointAt(w.path, m.t);
         return (
           <g key={m.id}>
-            {[0.05, 0.1].map((lag, k) => {
+            {(fx ? [0.05, 0.1] : []).map((lag, k) => {
               const q = pointAt(w.path, m.t - lag * (300 / w.path.len));
               return (
                 <circle
@@ -1203,7 +1232,7 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
                   cy={q.y}
                   r={2.4 - k * 0.7}
                   style={{
-                    fill: m.paced ? "var(--ok)" : ITEM[m.kind],
+                    fill: m.paced ? "var(--ft-ok)" : ITEM[m.kind],
                     opacity: 0.35 - k * 0.15,
                   }}
                 />
@@ -1239,11 +1268,18 @@ function Scene({ G, s }: { G: Graph; s: Sim }) {
 export function ProcessWorldView({
   world,
   className,
+  theme,
+  motion,
 }: {
   world: ProcessWorld;
   className?: string;
+  /** A flow theme id, or a whole theme (a client theme stored in a flow note). Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string | FlowTheme;
+  /** Overrides the theme's motion level. Reduced motion always wins. */
+  motion?: MotionLevel;
 }) {
-  const reduced = usePrefersReducedMotion();
+  const look = useFlowLook(theme, motion);
+  const still_ = look.motion === "still";
   const G = useMemo(() => graphOf(world), [world]);
   const sim = useRef<Sim | null>(null);
   // The same on the server and in the browser; warmed up after mount.
@@ -1262,10 +1298,10 @@ export function ProcessWorldView({
     const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced]);
+  }, [still_]);
 
   useEffect(() => {
-    if (reduced || !onScreen) return;
+    if (still_ || !onScreen) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -1277,27 +1313,29 @@ export function ProcessWorldView({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, onScreen, G]);
+  }, [still_, onScreen, G]);
 
   const stills = useMemo(
     () =>
-      reduced
+      still_
         ? [still(G, LENGTH.before - 1), still(G, LENGTH.before + 7)]
         : null,
-    [reduced, G],
+    [still_, G],
   );
 
-  if (stills) {
-    return (
-      <figure className={cx("grid gap-8", className)}>
-        <Scene G={G} s={stills[0]} />
-        <Scene G={G} s={stills[1]} />
-      </figure>
-    );
-  }
   return (
-    <figure ref={box} className={className}>
-      <Scene G={G} s={sim.current!} />
-    </figure>
+    <LookProvider value={look}>
+      <FlowThemeStyle theme={look.theme} />
+      {stills ? (
+        <figure className={cx("grid gap-8", className)} {...lookAttrs(look)}>
+          <Scene G={G} s={stills[0]} />
+          <Scene G={G} s={stills[1]} />
+        </figure>
+      ) : (
+        <figure ref={box} className={className} {...lookAttrs(look)}>
+          <Scene G={G} s={sim.current!} />
+        </figure>
+      )}
+    </LookProvider>
   );
 }

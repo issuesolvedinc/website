@@ -3,9 +3,16 @@
 import "./process-world.css";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  FlowThemeStyle,
+  LookProvider,
+  lookAttrs,
+  useFlowLook,
+  useLook,
+} from "@/components/flow-theme/flow-theme";
 import type { ItemKind, Tool } from "@/content/process-worlds";
 import { cx } from "@/lib/cx";
-import { usePrefersReducedMotion } from "@/lib/use-media-query";
+import type { FlowTheme, MotionLevel } from "@/lib/flow/theme";
 import {
   AMBER,
   Glyph,
@@ -14,6 +21,7 @@ import {
   TOOL,
   Tile,
   Token,
+  headPath,
   lane,
   octo,
   pathOf,
@@ -524,8 +532,9 @@ function Shell({
   pulse?: number;
 }) {
   const { w, h } = size(n);
+  const { radius: r, glow } = useLook().theme.shape;
   const edge = ok
-    ? "var(--ok)"
+    ? "var(--ft-ok)"
     : heat
       ? `color-mix(in srgb, ${HOT} ${Math.round(heat * 100)}%, var(--pw-edge))`
       : undefined;
@@ -535,17 +544,17 @@ function Shell({
       className={cx("pw-node", dim && "pw-idle")}
       transform={shake ? `translate(${shake.toFixed(2)} 0)` : undefined}
     >
-      {(heat > 0 || ok) && (
+      {glow > 0 && (heat > 0 || ok) && (
         <rect
           x={n.x - 6}
           y={n.y - 6}
           width={w + 12}
           height={h + 12}
-          rx={14}
+          rx={r ? r + 4 : 0}
           className="pw-heat"
           style={{
-            fill: ok ? "var(--ok)" : HOT,
-            opacity: ok ? 0.12 : heat * 0.3,
+            fill: ok ? "var(--ft-ok)" : HOT,
+            opacity: (ok ? 0.12 : heat * 0.3) * glow,
           }}
         />
       )}
@@ -554,7 +563,7 @@ function Shell({
         y={n.y}
         width={w}
         height={h}
-        rx={isPill(n) ? 9 : 10}
+        rx={isPill(n) ? Math.max(0, r - 1) : r}
         className="pw-card"
         style={
           edge
@@ -572,7 +581,7 @@ function Shell({
       ) : (
         <>
           <path
-            d={`M${n.x} ${n.y + HEAD} V${n.y + 10} A10 10 0 0 1 ${n.x + 10} ${n.y} H${n.x + w - 10} A10 10 0 0 1 ${n.x + w} ${n.y + 10} V${n.y + HEAD} Z`}
+            d={headPath(n.x, n.y, w, HEAD, r)}
             className="pw-head"
           />
           <Tile tool={n.tool} x={n.x + 6} y={n.y + 4} />
@@ -821,7 +830,7 @@ function Warn({ n, time }: { n: Node; time: number }) {
       <g transform={`scale(${beat.toFixed(3)})`}>
         <path d={tri} style={{ fill: AMBER }} strokeLinejoin="round" />
         <path d="M0 -3 V1.4" className="pw-tick" />
-        <circle cy={3.6} r={0.95} style={{ fill: "#fff" }} />
+        <circle cy={3.6} r={0.95} style={{ fill: "var(--ft-on-color)" }} />
       </g>
     </g>
   );
@@ -873,6 +882,7 @@ function EndClock({ n, time, hit }: { n: Node; time: number; hit: number }) {
 
 /** Where the connected line ends: a big green check. It swells and a ring spreads as each ticket lands. */
 function EndCheck({ n, t }: { n: Node; t: number }) {
+  const { glow } = useLook().theme.shape;
   const c = { x: n.x + END_R, y: n.y + END_R };
   const bump = t < 0.4 ? Math.sin((t / 0.4) * Math.PI) * 0.08 : 0;
   return (
@@ -882,7 +892,7 @@ function EndCheck({ n, t }: { n: Node; t: number }) {
         cy={c.y}
         r={END_R + 7}
         className="pw-heat"
-        style={{ fill: "var(--ok)", opacity: 0.18 }}
+        style={{ fill: "var(--ft-ok)", opacity: 0.18 * glow }}
       />
       {t < RIPPLE * 1.4 && (
         <circle
@@ -891,13 +901,13 @@ function EndCheck({ n, t }: { n: Node; t: number }) {
           r={END_R + (t / (RIPPLE * 1.4)) * 22}
           className="pw-end-ring"
           style={{
-            stroke: "var(--ok)",
+            stroke: "var(--ft-ok)",
             opacity: 0.7 * (1 - t / (RIPPLE * 1.4)),
           }}
         />
       )}
       <g transform={`translate(${c.x} ${c.y}) scale(${(1 + bump).toFixed(3)})`}>
-        <circle r={END_R} style={{ fill: "var(--ok)" }} />
+        <circle r={END_R} style={{ fill: "var(--ft-ok)" }} />
         <path
           d="M-10.5 0.5 L-3.5 7.5 L11 -7.5"
           className="pw-tick pw-tick-big"
@@ -952,7 +962,13 @@ function Bar({ n, prog, color }: { n: Node; prog: number; color: string }) {
 
 function Scene({ s }: { s: Sim }) {
   const uid = "mf" + useId().replace(/[^a-zA-Z0-9]/g, "");
+  const { theme, fx } = useLook();
+  const r = theme.shape.radius;
+  const fr = theme.shape.frame;
   const time = s.time;
+  // Figures, warnings and other effects move only at the animated level; below it they hold one pose. The work,
+  // the queues, the counts and the clocks still move at "subtle".
+  const pose = fx ? time : 0;
   const load = new Map<number, number>();
   for (const m of s.moving)
     if (m.delay <= 0) load.set(m.wire, (load.get(m.wire) ?? 0) + 1);
@@ -987,7 +1003,7 @@ function Scene({ s }: { s: Sim }) {
           <Person
             c={c}
             mood="worn"
-            time={time}
+            time={pose}
             crew={n.kind === "team"}
             clock={n.kind === "team"}
           />
@@ -997,7 +1013,7 @@ function Scene({ s }: { s: Sim }) {
           <Person
             c={c}
             mood={idle ? "idle" : "busy"}
-            time={time}
+            time={pose}
             rate={n.id === "inbox" ? 4 : 9}
           />
         );
@@ -1010,8 +1026,8 @@ function Scene({ s }: { s: Sim }) {
           count={
             piled ? (piled >= INV_MAX ? `${INV_MAX}+` : piled) : pile.length
           }
-          shake={ld > 0.85 ? Math.sin(time * 24 + i) * 0.7 : 0}
-          pulse={ease(time - st.hit)}
+          shake={fx && ld > 0.85 ? Math.sin(time * 24 + i) * 0.7 : 0}
+          pulse={fx ? ease(time - st.hit) : 0}
         >
           {n.kind !== "system" && <Disc c={c} tool={n.tool} />}
           {figure}
@@ -1027,7 +1043,7 @@ function Scene({ s }: { s: Sim }) {
           {n.kind !== "team" && <Bar n={n} prog={prog} color={TOOL[n.tool]} />}
           <Pile n={n} items={pile} />
           {idle && n.kind !== "team" && n.id !== "backlog" && (
-            <Warn n={n} time={time} />
+            <Warn n={n} time={pose} />
           )}
         </Shell>
       );
@@ -1064,10 +1080,12 @@ function Scene({ s }: { s: Sim }) {
     );
   }
   const reached = since(time, LAST * STEP);
-  const hop = reached < 0.4 ? Math.sin((reached / 0.4) * Math.PI) * 4 : 0;
+  const hop =
+    fx && reached < 0.4 ? Math.sin((reached / 0.4) * Math.PI) * 4 : 0;
   const handed = since(time, END);
   const sweepT = time % SWEEP_EVERY;
-  const sweepX = sweepT < SWEEP_DUR ? (sweepT / SWEEP_DUR) * (W + TRAIL) : null;
+  const sweepX =
+    fx && sweepT < SWEEP_DUR ? (sweepT / SWEEP_DUR) * (W + TRAIL) : null;
 
   const line = LINE.map((id, i) => {
     const n = BY[id];
@@ -1076,13 +1094,13 @@ function Scene({ s }: { s: Sim }) {
     const prog = dwelling[i];
     const active = prog !== undefined;
     let figure: React.ReactNode;
-    if (n.kind === "agent") figure = <Agent c={c} time={time} />;
+    if (n.kind === "agent") figure = <Agent c={c} time={pose} />;
     else if (n.kind === "team") figure = <Happy c={c} hop={hop} />;
     else
       figure = (
         <>
           <Disc c={c} tool={n.tool} />
-          <Person c={c} mood={active ? "busy" : "glad"} time={time} />
+          <Person c={c} mood={active ? "busy" : "glad"} time={pose} />
         </>
       );
     const left = since(time, LEAVES(i));
@@ -1093,17 +1111,17 @@ function Scene({ s }: { s: Sim }) {
         : since(time, i * STEP - (d.x - n.x) / V);
     const landed = since(time, i * STEP);
     return (
-      <Shell key={id} n={n} ok pulse={ease(inAt)}>
+      <Shell key={id} n={n} ok pulse={fx ? ease(inAt) : 0}>
         <path d={`M${n.x} ${d.y} H${n.x + NW}`} className="pw-track-line" />
         <rect
           x={d.x - 13}
           y={d.y - 11}
           width={26}
           height={22}
-          rx={6}
+          rx={Math.min(6, r * 0.6)}
           className="pw-desk"
         />
-        {landed < RIPPLE && (
+        {fx && landed < RIPPLE && (
           <circle
             cx={d.x}
             cy={d.y}
@@ -1134,14 +1152,15 @@ function Scene({ s }: { s: Sim }) {
           </g>
         )}
         {id === "orchestrate" &&
-          s.rings.map((r) => (
+          fx &&
+          s.rings.map((g) => (
             <circle
-              key={r.id}
+              key={g.id}
               cx={c.x}
               cy={c.y}
-              r={14 + (r.t / 0.6) * 18}
+              r={14 + (g.t / 0.6) * 18}
               className="pw-settle"
-              style={{ opacity: 0.8 * (1 - r.t / 0.6) }}
+              style={{ opacity: 0.8 * (1 - g.t / 0.6) }}
             />
           ))}
       </Shell>
@@ -1160,9 +1179,9 @@ function Scene({ s }: { s: Sim }) {
           y={y}
           width={44}
           height={30}
-          rx={8}
+          rx={Math.max(0, r - 2)}
           className="pw-card"
-          style={{ stroke: "var(--ok)" }}
+          style={{ stroke: "var(--ft-ok)" }}
         />
         <Tile tool={tool} x={x + 13} y={y + 6} />
       </g>
@@ -1185,11 +1204,11 @@ function Scene({ s }: { s: Sim }) {
           <circle cx={1} cy={1} r={1} className="pw-grid-dot" />
         </pattern>
         <linearGradient id={`${uid}-sweep`} x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0" stopColor="var(--ok)" stopOpacity="0" />
-          <stop offset="1" stopColor="var(--ok)" stopOpacity="0.28" />
+          <stop offset="0" style={{ stopColor: "var(--ft-ok)", stopOpacity: 0 }} />
+          <stop offset="1" style={{ stopColor: "var(--ft-ok)", stopOpacity: 0.28 }} />
         </linearGradient>
         <clipPath id={`${uid}-clip`}>
-          <rect x={0.5} y={0.5} width={W - 1} height={H - 1} rx={16} />
+          <rect x={0.5} y={0.5} width={W - 1} height={H - 1} rx={fr} />
         </clipPath>
       </defs>
       <rect
@@ -1197,7 +1216,7 @@ function Scene({ s }: { s: Sim }) {
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={fr}
         className="pw-canvas"
       />
       <rect
@@ -1205,7 +1224,7 @@ function Scene({ s }: { s: Sim }) {
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={fr}
         fill={`url(#${uid}-dot)`}
       />
       <rect
@@ -1213,7 +1232,7 @@ function Scene({ s }: { s: Sim }) {
         y={1}
         width={W - 2}
         height={286}
-        rx={15}
+        rx={Math.max(0, fr - 1)}
         style={{ fill: HOT, opacity: 0.025 }}
       />
       <rect
@@ -1221,15 +1240,15 @@ function Scene({ s }: { s: Sim }) {
         y={300}
         width={W - 2}
         height={H - 301}
-        rx={15}
-        style={{ fill: "var(--ok)", opacity: 0.04 }}
+        rx={Math.max(0, fr - 1)}
+        style={{ fill: "var(--ft-ok)", opacity: 0.04 }}
       />
       <rect
         x={0.5}
         y={0.5}
         width={W - 1}
         height={H - 1}
-        rx={16}
+        rx={fr}
         className="pw-frame"
       />
       <text x={24} y={46} className="pw-lane">
@@ -1242,7 +1261,7 @@ function Scene({ s }: { s: Sim }) {
       {WIRES.map((w, i) => {
         const n = load.get(i) ?? 0;
         const tone =
-          BY[w.to].y > 290 ? "var(--flow)" : w.back ? AMBER : "var(--flow)";
+          BY[w.to].y > 290 ? "var(--ft-flow)" : w.back ? AMBER : "var(--ft-flow)";
         const len = w.path.len;
         return (
           <g
@@ -1299,7 +1318,7 @@ function Scene({ s }: { s: Sim }) {
             <path
               d={d}
               className="pw-wire-flow pw-wire-steady"
-              style={{ stroke: "var(--ok)" }}
+              style={{ stroke: "var(--ft-ok)" }}
             />
           </g>
         );
@@ -1309,7 +1328,7 @@ function Scene({ s }: { s: Sim }) {
         <path
           d={FINAL.d}
           className="pw-wire-flow pw-wire-steady"
-          style={{ stroke: "var(--ok)" }}
+          style={{ stroke: "var(--ft-ok)" }}
         />
       </g>
       <path d={LOOP.d} className="pw-loop" />
@@ -1317,7 +1336,7 @@ function Scene({ s }: { s: Sim }) {
 
       {NODES.filter(isSrc).map((n) => {
         const t = time - s.nodes[n.id].hit;
-        const pulse = t < 0.35 ? 1 - t / 0.35 : 0;
+        const pulse = fx && t < 0.35 ? 1 - t / 0.35 : 0;
         return (
           <Shell key={n.id} n={n}>
             <circle
@@ -1335,8 +1354,12 @@ function Scene({ s }: { s: Sim }) {
       })}
       {today}
       {line}
-      <EndClock n={BY.late} time={time} hit={time - s.nodes.late.hit} />
-      <EndCheck n={BY.done} t={handed} />
+      <EndClock
+        n={BY.late}
+        time={time}
+        hit={fx ? time - s.nodes.late.hit : Infinity}
+      />
+      <EndCheck n={BY.done} t={fx ? handed : Infinity} />
 
       {/* Waiting to be typed in again, between two systems that are not connected. */}
       {s.moving
@@ -1346,7 +1369,9 @@ function Scene({ s }: { s: Sim }) {
           return (
             <g
               key={m.id}
-              style={{ opacity: 0.45 + 0.45 * Math.abs(Math.sin(time * 5)) }}
+              style={{
+                opacity: fx ? 0.45 + 0.45 * Math.abs(Math.sin(time * 5)) : 0.7,
+              }}
             >
               <Token item={m} p={p} s={1.1} />
             </g>
@@ -1359,7 +1384,7 @@ function Scene({ s }: { s: Sim }) {
           <g
             key={d.id}
             style={{ opacity: 1 - t }}
-            transform={`rotate(${t * 160} ${p.x} ${p.y})`}
+            transform={fx ? `rotate(${t * 160} ${p.x} ${p.y})` : undefined}
           >
             <Token item={d} p={p} />
           </g>
@@ -1386,7 +1411,7 @@ function Scene({ s }: { s: Sim }) {
           cx={pointAt(LOOP, handed / LOOP_DUR).x}
           cy={pointAt(LOOP, handed / LOOP_DUR).y}
           r={3.5}
-          style={{ fill: "var(--ok)" }}
+          style={{ fill: "var(--ft-ok)" }}
         />
       )}
       {sweepX !== null && (
@@ -1408,8 +1433,19 @@ function Scene({ s }: { s: Sim }) {
 const DESCRIPTION =
   "Today work piles up across inboxes and systems; with IssueSolved it moves along one line, checked at each step, and your team gets time back.";
 
-export function MainFlow({ className }: { className?: string }) {
-  const reduced = usePrefersReducedMotion();
+export function MainFlow({
+  className,
+  theme,
+  motion,
+}: {
+  className?: string;
+  /** A flow theme id, or a whole theme (a client theme stored in a flow note). Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string | FlowTheme;
+  /** Overrides the theme's motion level. Reduced motion always wins. */
+  motion?: MotionLevel;
+}) {
+  const look = useFlowLook(theme, motion);
+  const frozenLevel = look.motion === "still";
   const sim = useRef<Sim>(fresh());
   const [, setFrame] = useState(0);
   const box = useRef<HTMLElement>(null);
@@ -1425,10 +1461,10 @@ export function MainFlow({ className }: { className?: string }) {
     const io = new IntersectionObserver(([e]) => setOnScreen(e.isIntersecting));
     io.observe(el);
     return () => io.disconnect();
-  }, [reduced]);
+  }, [frozenLevel]);
 
   useEffect(() => {
-    if (reduced || !onScreen) return;
+    if (frozenLevel || !onScreen) return;
     let raf = 0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -1440,19 +1476,22 @@ export function MainFlow({ className }: { className?: string }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reduced, onScreen]);
+  }, [frozenLevel, onScreen]);
 
-  const frozen = useMemo(() => (reduced ? still(WARM) : null), [reduced]);
+  const frozen = useMemo(() => (frozenLevel ? still(WARM) : null), [frozenLevel]);
 
   return (
-    <figure ref={box} className={className}>
-      <figcaption className="sr-only">{DESCRIPTION}</figcaption>
-      {/* Below a laptop the map keeps a readable size and scrolls sideways inside its own frame. */}
-      <div className="-mx-[var(--gutter)] overflow-x-auto px-[var(--gutter)] lg:mx-0 lg:overflow-visible lg:px-0">
-        <div className="min-w-[66rem] lg:min-w-0">
-          <Scene s={frozen ?? sim.current} />
+    <LookProvider value={look}>
+      <FlowThemeStyle theme={look.theme} />
+      <figure ref={box} className={className} {...lookAttrs(look)}>
+        <figcaption className="sr-only">{DESCRIPTION}</figcaption>
+        {/* Below a laptop the map keeps a readable size and scrolls sideways inside its own frame. */}
+        <div className="-mx-[var(--gutter)] overflow-x-auto px-[var(--gutter)] lg:mx-0 lg:overflow-visible lg:px-0">
+          <div className="min-w-[66rem] lg:min-w-0">
+            <Scene s={frozen ?? sim.current} />
+          </div>
         </div>
-      </div>
-    </figure>
+      </figure>
+    </LookProvider>
   );
 }
