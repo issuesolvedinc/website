@@ -31,7 +31,7 @@ import {
   type FlowNode,
   type FlowPace,
 } from "@/lib/flow/definition";
-import { DENSITY, type MotionLevel } from "@/lib/flow/theme";
+import { DENSITY, type FlowTheme, type MotionLevel } from "@/lib/flow/theme";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { FlowSteps } from "./flow-steps";
 import { KindIcon } from "./kind-icon";
@@ -57,8 +57,8 @@ export type AgentFlowProps = {
   caption?: boolean;
   /** Live queue counts by node id, for an animation that fills or drains a step. Falls back to each node's own queue. */
   queues?: Record<string, number>;
-  /** A flow theme id. Defaults to the nearest FlowThemeProvider, then IssueSolved. */
-  theme?: string;
+  /** A flow theme id, or a whole theme (a client theme stored in a flow note). Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string | FlowTheme;
   /**
    * Overrides the theme's motion level. "still" stops the lights, "subtle" keeps them and drops the running
    * highlight. Reduced motion always wins.

@@ -27,6 +27,11 @@ export type FlowNode = {
    * A picture of the flow, not a measurement: leave it out for steps that keep up.
    */
   queue?: number;
+  /**
+   * Where the step points: a vault note such as "[[Client record]]", or a web address. The host decides how to
+   * open it; a client facing view shows it as a plain link, never as the tool behind the step.
+   */
+  link?: string;
 };
 
 /**

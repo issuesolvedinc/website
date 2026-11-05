@@ -21,7 +21,7 @@ import {
   useLook,
 } from "@/components/flow-theme/flow-theme";
 import { cx } from "@/lib/cx";
-import type { MotionLevel } from "@/lib/flow/theme";
+import type { FlowTheme, MotionLevel } from "@/lib/flow/theme";
 
 /*
   One business process on a node canvas, alive. Work arrives from its sources (emails, scans, forms, calls) and
@@ -1273,8 +1273,8 @@ export function ProcessWorldView({
 }: {
   world: ProcessWorld;
   className?: string;
-  /** A flow theme id. Defaults to the nearest FlowThemeProvider, then IssueSolved. */
-  theme?: string;
+  /** A flow theme id, or a whole theme (a client theme stored in a flow note). Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string | FlowTheme;
   /** Overrides the theme's motion level. Reduced motion always wins. */
   motion?: MotionLevel;
 }) {

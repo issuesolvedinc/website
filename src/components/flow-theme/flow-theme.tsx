@@ -1,7 +1,6 @@
 "use client";
 
-import { createContext, useContext } from "react";
-import { usePrefersReducedMotion } from "@/lib/use-media-query";
+import { createContext, useContext, useSyncExternalStore } from "react";
 import {
   DEFAULT_FLOW_THEME,
   effectiveMotion,
@@ -12,12 +11,28 @@ import {
 } from "@/lib/flow/theme";
 
 /*
-  The React side of flow themes. A page picks a theme for every flow inside it with FlowThemeProvider, or one flow
-  takes a theme prop. Each engine calls useFlowLook at its root, puts lookAttrs on its outer element and renders
+  The React side of flow themes. It imports only React and the theme data, so it runs in any React host: the
+  website, the web apps, an Obsidian plugin. A page picks a theme for every flow inside it with
+  FlowThemeProvider, or one flow takes a theme prop: a built-in theme's id, or a whole theme object. Each engine calls useFlowLook at its root, puts lookAttrs on its outer element and renders
   FlowThemeStyle once; React hoists the style into the head and keeps one copy per theme.
 */
 
-type Choice = { theme?: string; motion?: MotionLevel };
+type Choice = { theme?: string | FlowTheme; motion?: MotionLevel };
+
+const REDUCE = "(prefers-reduced-motion: reduce)";
+
+/** True while the system asks for reduced motion. False on the server and on the first render. */
+function useReducedMotion() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const mq = window.matchMedia(REDUCE);
+      mq.addEventListener("change", onChange);
+      return () => mq.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(REDUCE).matches,
+    () => false,
+  );
+}
 
 const ChoiceContext = createContext<Choice>({});
 
@@ -39,10 +54,11 @@ export type FlowLook = {
 };
 
 /** The look for one flow: its own props first, then the nearest provider, then the default theme. */
-export function useFlowLook(theme?: string, motion?: MotionLevel): FlowLook {
+export function useFlowLook(theme?: string | FlowTheme, motion?: MotionLevel): FlowLook {
   const choice = useContext(ChoiceContext);
-  const reduced = usePrefersReducedMotion();
-  const t = flowTheme(theme ?? choice.theme ?? DEFAULT_FLOW_THEME);
+  const reduced = useReducedMotion();
+  const pick = theme ?? choice.theme ?? DEFAULT_FLOW_THEME;
+  const t = typeof pick === "string" ? flowTheme(pick) : pick;
   const m = effectiveMotion(motion ?? choice.motion ?? t.motion, reduced);
   return { theme: t, motion: m, fx: m === "animated" };
 }

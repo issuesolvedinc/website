@@ -12,7 +12,7 @@ import {
 } from "@/components/flow-theme/flow-theme";
 import type { ItemKind, Tool } from "@/content/process-worlds";
 import { cx } from "@/lib/cx";
-import type { MotionLevel } from "@/lib/flow/theme";
+import type { FlowTheme, MotionLevel } from "@/lib/flow/theme";
 import {
   AMBER,
   Glyph,
@@ -1439,8 +1439,8 @@ export function MainFlow({
   motion,
 }: {
   className?: string;
-  /** A flow theme id. Defaults to the nearest FlowThemeProvider, then IssueSolved. */
-  theme?: string;
+  /** A flow theme id, or a whole theme (a client theme stored in a flow note). Defaults to the nearest FlowThemeProvider, then IssueSolved. */
+  theme?: string | FlowTheme;
   /** Overrides the theme's motion level. Reduced motion always wins. */
   motion?: MotionLevel;
 }) {
